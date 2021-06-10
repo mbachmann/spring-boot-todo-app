@@ -11,6 +11,7 @@ public class TodoItem {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long itemId;
 
+    @Column(columnDefinition = "BINARY(16)")
     private UUID listId;
 
     @NotEmpty(message="* Enter Task Name")
