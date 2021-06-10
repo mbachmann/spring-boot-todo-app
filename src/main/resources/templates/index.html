@@ -1,0 +1,42 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>Create and share a check list just a second! Publist - Never miss a thing!</title>
+    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
+
+    <!--For jquery calling REST API-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <!--For material icon-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="/js/index.js"></script>
+</head>
+
+<body>
+
+<div class="todo-content">
+    <h1 class="page-title"> My Todo </h1>
+
+    <div class="todo-create">
+        <!--Create a text box and handle ENTER to create item-->
+        <form action="#">
+            <input type="text" id="taskNameTextField" class="form-control" onkeypress="handleEnterKey(event)"
+                   placeholder="Input task name then tap Enter to add">
+        </form>
+    </div>
+
+    <!-- contains the list with the todoItems -->
+    <ul class="todo-list">
+    </ul>
+
+    <!-- First grab an UUID from backend ... listId is added at Java MainController -->
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        let glistId = /*[[${listId}]]*/
+        /*]]>*/
+    </script>
+</div>
+</body>
+
+</html>

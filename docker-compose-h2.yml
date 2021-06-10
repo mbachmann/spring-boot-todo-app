@@ -1,0 +1,14 @@
+
+version: '2'
+
+services:
+
+  todo-app-h2:
+    image: uportal/todo-app:latest
+
+    restart: always
+    environment:
+      APP_NAME: Todo App with H2
+      ACTIVE_PROFILES: dev,h2
+    ports:
+      - 8080:8080

@@ -1,0 +1,25 @@
+version: '2'
+
+
+networks:
+  proxy:
+    external: true
+
+services:
+
+  todo-app-h2:
+    image: uportal/todo-rest-spring:latest
+    labels:
+      - "traefik.backend=todo-h2"
+      - "traefik.frontend.rule=Host:todo-h2.united-portal.com"
+      - "traefik.docker.network=proxy"
+      - "traefik.port=8080"
+      - "traefik.enable=true"
+
+    restart: always
+    networks:
+      - proxy
+    environment:
+      APP_NAME: Todo Rest with Spring Boot and H2
+      ACTIVE_PROFILES: dev,h2
+
