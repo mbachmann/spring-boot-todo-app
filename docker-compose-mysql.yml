@@ -18,7 +18,7 @@ services:
     ports:
       - 8080:8080
 
-  adminer:
+  todo-adminer:
     image: adminer:4.8.0
     restart: always
     ports:
@@ -26,7 +26,7 @@ services:
     environment:
       ADMINER_DEFAULT_SERVER: dbmysql8-todoappdb
 
-  dbmysql8:
+  todo-dbmysql8:
     image: mysql:8.0.23
     command: --default-authentication-plugin=mysql_native_password
     container_name: dbmysql8-todoappdb

@@ -469,7 +469,7 @@ contains options to:
 - UTF-8 character encoding
 
 ```properties
-spring.jpa.hibernate.ddl-auto=none
+spring.jpa.hibernate.ddl-auto=update
 spring.jpa.database-platform=org.hibernate.dialect.MySQL5InnoDBDialect
 spring.jpa.open-in-view=false
 spring.jpa.properties.hibernate.id.new_generator_mappings=false
@@ -480,8 +480,6 @@ spring.datasource.url=jdbc:mysql://${APP_DB_HOST:localhost}:${APP_DB_PORT:3306}/
 spring.datasource.username= ${APP_DB_USERNAME:root}
 spring.datasource.password=${APP_DB_PASSWORD:password}
 ```
-
-
 
 ## Implement Client
 
@@ -1019,8 +1017,7 @@ Use a Mac, Linux, WSL2 or git bash console.
 
 ```
 git clone https://github.com/mbachmann/spring-boot-todo-app
-cd file-system-storage
-git checkout docker
+cd spring-boot-todo-app
 ./mvnw clean package
 java -jar target/todo*.jar
 ```
@@ -1181,7 +1178,7 @@ services:
     ports:
       - 8080:8080
 
-  adminer:
+  todo-adminer:
     image: adminer:4.8.0
     restart: always
     ports:
@@ -1189,7 +1186,7 @@ services:
     environment:
       ADMINER_DEFAULT_SERVER: dbmysql8-todoappdb
 
-  dbmysql8:
+  todo-dbmysql8:
     image: mysql:8.0.23
     command: --default-authentication-plugin=mysql_native_password
     container_name: dbmysql8-todoappdb
