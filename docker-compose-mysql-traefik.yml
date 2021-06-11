@@ -15,6 +15,7 @@ services:
     environment:
       APP_NAME: Todo App with MySQL
       ACTIVE_PROFILES: dev,mysql
+      APP_URL: https://todo-h2.united-portal.com
       APP_DB_HOST: dbmysql8-todoappdb
       APP_DB_PORT: 3306
       APP_DB_NAME: todoapp

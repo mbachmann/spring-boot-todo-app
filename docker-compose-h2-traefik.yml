@@ -22,4 +22,4 @@ services:
     environment:
       APP_NAME: Todo Rest with Spring Boot and H2
       ACTIVE_PROFILES: dev,h2
-
+      APP_URL: https://todo-h2.united-portal.com
