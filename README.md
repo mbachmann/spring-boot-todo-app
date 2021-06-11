@@ -123,14 +123,25 @@ import javax.validation.constraints.NotEmpty;
 
 @Entity
 public class TodoItem {
+
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long itemId;
 
+    @Column(columnDefinition = "BINARY(16)")
     private UUID listId;
 
     @NotEmpty(message="* Enter Task Name")
     private String taskName;
+
+    public TodoItem() {}
+
+    public TodoItem(UUID listId, String taskName, Date createdAt) {
+        this.listId = listId;
+        this.taskName = taskName;
+        this.createdAt = createdAt;
+    }
 
     private Boolean isDone = false; // Default value
 
@@ -189,10 +200,14 @@ Annotations:
 - **@NotEmpty**, The annotated element must not be null nor empty. Supported types are: CharSequence, Collection, Map and Array
 - **@Email** The string has to be a well-formed email address.
 
+<br/>
+
 ##  Create the Repository for the model
 
 The query builder mechanism built into Spring Data repository infrastructure is useful for building constraining  
 queries over entities of the repository.
+
+
 
 Adding TodoItemRepository.java
 
@@ -202,12 +217,165 @@ import java.util.UUID;
 
 import com.example.todo.model.TodoItem;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface TodoItemRepository extends JpaRepository<TodoItem, Long> {
     TodoItem findByItemId(Long itemId);
     List<TodoItem> findByListId(UUID listId);
+    @Query("select distinct listId from TodoItem ")
+    List<UUID> findDistinctListId();
+}
+```
+
+## Create the DTO's
+
+The Data Transfer Objects provide some additional serialization opportunities for the todo item data.
+
+### TodoItemListsDTO
+
+The DTO is providing an object with a count and a list of uuid's.
+
+```json
+{
+  "count": 2,
+  "todoItemList": [
+    "4cfb7b98-ef1e-43c5-9681-9fc6def818d3",
+    "75f1c193-c8cb-4c85-97b9-980cc7a36b2e"
+  ]
+}
+```
+
+
+Add the code to TodoItemListsDTO.java file.
+
+```java
+import java.util.List;
+import java.util.UUID;
+
+public class TodoItemListsDTO {
+
+    private int count;
+    private List<UUID> todoItemList;
+
+    public TodoItemListsDTO(){}
+
+    public TodoItemListsDTO(int count, List<UUID> todoItemList){
+        this.count = count;
+        this.todoItemList = todoItemList;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public List<UUID> getTodoItemList() {
+        return todoItemList;
+    }
+
+    public void setTodoItemList(List<UUID> todoItemList) {
+        this.todoItemList = todoItemList;
+    }
+}
+```
+
+### TodoItemsDTO
+
+The DTO is providing a grouped structure of the todo items.
+
+```json
+[
+  {
+    "count": 1,
+    "listId": "4cfb7b98-ef1e-43c5-9681-9fc6def818d3",
+    "todoItemList": [
+      {
+        "itemId": 4,
+        "listId": "4cfb7b98-ef1e-43c5-9681-9fc6def818d3",
+        "taskName": "Einkaufen",
+        "createdAt": "2021-06-11T12:19:01.018+00:00",
+        "done": false
+      }
+    ]
+  },
+  {
+    "count": 3,
+    "listId": "75f1c193-c8cb-4c85-97b9-980cc7a36b2e",
+    "todoItemList": [
+      {
+        "itemId": 1,
+        "listId": "75f1c193-c8cb-4c85-97b9-980cc7a36b2e",
+        "taskName": "Wohnung reinigen",
+        "createdAt": "2021-06-11T12:18:31.391+00:00",
+        "done": false
+      },
+      {
+        "itemId": 2,
+        "listId": "75f1c193-c8cb-4c85-97b9-980cc7a36b2e",
+        "taskName": "JavaScript lernen",
+        "createdAt": "2021-06-11T12:18:40.744+00:00",
+        "done": false
+      },
+      {
+        "itemId": 3,
+        "listId": "75f1c193-c8cb-4c85-97b9-980cc7a36b2e",
+        "taskName": "Lernaufgaben erledigen",
+        "createdAt": "2021-06-11T12:18:49.290+00:00",
+        "done": false
+      }
+    ]
+  }
+]
+```
+
+The file TodoItemsDTO.java
+
+```java
+import java.util.List;
+import java.util.UUID;
+
+public class TodoItemsDTO {
+
+    private int count;
+    private UUID listId;
+    private List<TodoItem> todoItemList;
+
+    public TodoItemsDTO(){}
+
+    public TodoItemsDTO(int count, UUID listId, List<TodoItem> todoItemList){
+        this.count = count;
+        this.listId = listId;
+        this.todoItemList = todoItemList;
+    }
+
+    public int getCount() {
+        return count;
+    }
+
+    public void setCount(int count) {
+        this.count = count;
+    }
+
+    public UUID getListId() {
+        return listId;
+    }
+
+    public void setListId(UUID listId) {
+        this.listId = listId;
+    }
+
+    public List<TodoItem> getTodoItemList() {
+        return todoItemList;
+    }
+
+    public void setTodoItemList(List<TodoItem> todoItemList) {
+        this.todoItemList = todoItemList;
+    }
 }
 
 ```
@@ -217,10 +385,14 @@ public interface TodoItemRepository extends JpaRepository<TodoItem, Long> {
 Adding TodoItemService.java
 
 ```java
+import com.example.todo.dto.TodoItemListsDTO;
+import com.example.todo.dto.TodoItemsDTO;
 import com.example.todo.model.TodoItem;
 import com.example.todo.repository.TodoItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -267,6 +439,34 @@ public class TodoItemService {
         return todoItemRepository.findByListId(listId);
     }
 
+    /**
+     * Return a DTO containing a list of UUID's and the count
+     *
+     * @return the TodoItemListsDTO
+     */
+    public TodoItemListsDTO getTodoItemListIDs() {
+        List<UUID> listIds = todoItemRepository.findDistinctListId();
+        return new TodoItemListsDTO(listIds.size(), listIds);
+
+    }
+
+    /**
+     * Return a DTO containing a list of todoLists including a count
+     *
+     * @return the TodoItemListsDTO
+     */
+    public List<TodoItemsDTO> getTodoItemLists() {
+        List<TodoItemsDTO> todoItemsDTOs = new ArrayList<>();
+        List<UUID> listIds = todoItemRepository.findDistinctListId();
+
+        listIds.forEach(listId -> {
+            List<TodoItem> todoItems = this.getAllTodoItemsForListId(listId);
+            todoItemsDTOs.add(new TodoItemsDTO(todoItems.size(), listId, todoItems));
+        });
+        return todoItemsDTOs;
+    }
+
+
     public TodoItem getItem(Long id) {
         return todoItemRepository.findByItemId(id);
     }
@@ -281,6 +481,8 @@ This is REST Controller for CRUD operations of the todo items.
 Adding TodoItemController.java
 
 ```java
+import com.example.todo.dto.TodoItemListsDTO;
+import com.example.todo.dto.TodoItemsDTO;
 import com.example.todo.model.TodoItem;
 import com.example.todo.service.TodoItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -306,6 +508,19 @@ public class TodoItemController {
     public List<TodoItem> getItem(@PathVariable UUID listId) {
         return todoItemService.getAllTodoItemsForListId(listId);
     }
+
+    // Get all todo listIds
+    @GetMapping("/listids")
+    public TodoItemListsDTO getListIDs() {
+        return todoItemService.getTodoItemListIDs();
+    }
+
+    // Get all todo lists
+    @GetMapping("/list")
+    public List<TodoItemsDTO> getAllTodoItems() {
+        return todoItemService.getTodoItemLists();
+    }
+
 
     // New todo item
     @PostMapping(value = "/new")
@@ -339,9 +554,13 @@ Published end points:
 - PUT /api/v1/state/{id}
 - PUT /api/v1/edit
 - POST /api/v1/new
+- GET /api/v1/list
+- GET /api/v1/listids
 - GET /api/v1/list/{listId}   listId is a uuid eg. 3fa85f64-5717-4562-b3fc-2c963f66afa6
 - GET /api/v1/item/{itemId}
 - DELETE /api/v1/delete/{id}
+- 
+<br/>
 
 ## The TodoApplication
 

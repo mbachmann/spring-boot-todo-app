@@ -1,5 +1,7 @@
 package com.example.todo.rest;
 
+import com.example.todo.dto.TodoItemListsDTO;
+import com.example.todo.dto.TodoItemsDTO;
 import com.example.todo.model.TodoItem;
 import com.example.todo.service.TodoItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,19 @@ public class TodoItemController {
     public List<TodoItem> getItem(@PathVariable UUID listId) {
         return todoItemService.getAllTodoItemsForListId(listId);
     }
+
+    // Get all todo listIds
+    @GetMapping("/listids")
+    public TodoItemListsDTO getListIDs() {
+        return todoItemService.getTodoItemListIDs();
+    }
+
+    // Get all todo lists
+    @GetMapping("/list")
+    public List<TodoItemsDTO> getAllTodoItems() {
+        return todoItemService.getTodoItemLists();
+    }
+
 
     // New todo item
     @PostMapping(value = "/new")

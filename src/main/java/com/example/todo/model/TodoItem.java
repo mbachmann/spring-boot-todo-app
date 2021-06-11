@@ -7,6 +7,8 @@ import javax.validation.constraints.NotEmpty;
 
 @Entity
 public class TodoItem {
+
+
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long itemId;
@@ -16,6 +18,14 @@ public class TodoItem {
 
     @NotEmpty(message="* Enter Task Name")
     private String taskName;
+
+    public TodoItem() {}
+
+    public TodoItem(UUID listId, String taskName, Date createdAt) {
+        this.listId = listId;
+        this.taskName = taskName;
+        this.createdAt = createdAt;
+    }
 
     private Boolean isDone = false; // Default value
 

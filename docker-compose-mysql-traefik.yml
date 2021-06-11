@@ -1,0 +1,80 @@
+
+version: '3'
+
+networks:
+  proxy:
+    external: true
+  internal:
+    external: false
+services:
+
+  todo-app-mysql:
+    image: uportal/todo-app:latest
+
+    restart: always
+    environment:
+      APP_NAME: Todo App with MySQL
+      ACTIVE_PROFILES: dev,mysql
+      APP_DB_HOST: dbmysql8-todoappdb
+      APP_DB_PORT: 3306
+      APP_DB_NAME: todoapp
+      APP_DB_USERNAME: root
+      APP_DB_PASSWORD: todoapp
+    ports:
+      - 8080:8080
+    networks:
+      - internal
+      - proxy
+    labels:
+      - "traefik.backend=todo-app"
+      - "traefik.frontend.rule=Host:todo-app.united-portal.com"
+      - "traefik.docker.network=proxy"
+      - "traefik.port=8080"
+      - "traefik.enable=true"
+
+  todo-adminer:
+    image: adminer:4.8.0
+    restart: always
+    ports:
+      - 9090:8080
+    environment:
+      ADMINER_DEFAULT_SERVER: dbmysql8-todoappdb
+    networks:
+      - internal
+      - proxy
+    labels:
+      - "traefik.backend=todo-mysql"
+      - "traefik.frontend.rule=Host:todo-mysql.united-portal.com"
+      - "traefik.docker.network=proxy"
+      - "traefik.port=8080"
+      - "traefik.enable=true"
+
+  todo-dbmysql8:
+    image: mysql:8.0.23
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: dbmysql8-todoappdb
+    restart: always
+    cap_add:
+      - SYS_NICE
+    environment:
+      MYSQL_DATABASE: 'todoapp'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'user'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: 'todoapp'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'todoapp'
+    ports:
+      # <Port exposed> : < MySQL Port running inside container>, host port for using with mysql-workbench or dbeaver
+      - '33066:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '3306'
+      # Where our data will be persisted
+    volumes:
+      - dbmysql8-todoappdb:/var/lib/mysql
+    networks:
+      - internal
+# Names our volume
+volumes:
+  dbmysql8-todoappdb:

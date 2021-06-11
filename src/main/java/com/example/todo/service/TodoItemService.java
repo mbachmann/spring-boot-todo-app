@@ -1,10 +1,14 @@
 package com.example.todo.service;
 
 
+import com.example.todo.dto.TodoItemListsDTO;
+import com.example.todo.dto.TodoItemsDTO;
 import com.example.todo.model.TodoItem;
 import com.example.todo.repository.TodoItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,6 +54,34 @@ public class TodoItemService {
     public List<TodoItem> getAllTodoItemsForListId(UUID listId) {
         return todoItemRepository.findByListId(listId);
     }
+
+    /**
+     * Return a DTO containing a list of UUID's and the count
+     *
+     * @return the TodoItemListsDTO
+     */
+    public TodoItemListsDTO getTodoItemListIDs() {
+        List<UUID> listIds = todoItemRepository.findDistinctListId();
+        return new TodoItemListsDTO(listIds.size(), listIds);
+
+    }
+
+    /**
+     * Return a DTO containing a list of todoLists including a count
+     *
+     * @return the TodoItemListsDTO
+     */
+    public List<TodoItemsDTO> getTodoItemLists() {
+        List<TodoItemsDTO> todoItemsDTOs = new ArrayList<>();
+        List<UUID> listIds = todoItemRepository.findDistinctListId();
+
+        listIds.forEach(listId -> {
+            List<TodoItem> todoItems = this.getAllTodoItemsForListId(listId);
+            todoItemsDTOs.add(new TodoItemsDTO(todoItems.size(), listId, todoItems));
+        });
+        return todoItemsDTOs;
+    }
+
 
     public TodoItem getItem(Long id) {
         return todoItemRepository.findByItemId(id);
