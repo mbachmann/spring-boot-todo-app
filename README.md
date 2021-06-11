@@ -101,8 +101,8 @@ The spring-boot plugin allows to start the project.
 ## The project structure
 
 The structure of the project consists of files for the backend in main/java and files for the web application
-in resources. The project has beside the basic profile three additional spring profiles (dev, h2 and mysql).
-The _Dockerfile_ allows to create a deployable container. The docker-compose files are demonstrating how to configure  
+in resources folder. The project has beside the basic profile three additional spring profiles (dev, h2 and mysql).
+The _Dockerfile_ allows you to create a deployable container. The docker-compose files are demonstrating how to configure
 and orchestrate the containers.
 
 <br/>
@@ -112,6 +112,8 @@ and orchestrate the containers.
 <br/>
 
 ## Create the Data Model
+
+The model class is used to creat the database table and also to serialize the json information.
 
 We can create TodoItem.java as below:
 
@@ -204,9 +206,8 @@ Annotations:
 
 ##  Create the Repository for the model
 
-The query builder mechanism built into Spring Data repository infrastructure is useful for building constraining  
+The query builder mechanism built into Spring Data repository infrastructure is useful for building constraining
 queries over entities of the repository.
-
 
 
 Adding TodoItemRepository.java
