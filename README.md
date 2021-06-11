@@ -559,7 +559,7 @@ Published end points:
 - GET /api/v1/list/{listId}   listId is a uuid eg. 3fa85f64-5717-4562-b3fc-2c963f66afa6
 - GET /api/v1/item/{itemId}
 - DELETE /api/v1/delete/{id}
-- 
+
 <br/>
 
 ## The TodoApplication
