@@ -3,6 +3,7 @@ package com.example.todo.rest;
 import com.example.todo.dto.TodoItemListsDTO;
 import com.example.todo.dto.TodoItemsDTO;
 import com.example.todo.model.TodoItem;
+import com.example.todo.rest.advice.ResourceNotFoundException;
 import com.example.todo.service.TodoItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,10 @@ public class TodoItemController {
 
     @GetMapping("/item/{itemId}")
     public TodoItem getItem(@PathVariable Long itemId) {
-        return todoItemService.getItem(itemId);
+        TodoItem  todoItem = todoItemService.getItem(itemId);
+        if (todoItem == null) throw new ResourceNotFoundException("List item with id=" + itemId + " not found");
+        return todoItem;
+
     }
 
     // Get todo list, based on listId
@@ -56,13 +60,16 @@ public class TodoItemController {
     // Delete todo item
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Boolean> deleteTodoItem(@PathVariable Long id) {
-        return ResponseEntity.ok(todoItemService.deleteTodoItem(id));
+        if (!todoItemService.deleteTodoItem(id)) throw new ResourceNotFoundException("Delete not successful: List item with id=" + id + " not found");
+        return ResponseEntity.ok(true);
     }
 
     // Change done state
     @PutMapping("/state/{id}")
     public ResponseEntity<TodoItem> changeDoneState(@PathVariable Long id) {
-        return ResponseEntity.ok(todoItemService.changeDoneStateForTodoItem(id));
+        TodoItem  todoItem = todoItemService.changeDoneStateForTodoItem(id);
+        if (todoItem == null) throw new ResourceNotFoundException("ChangeDoneState not successful: List item with id=" + id + " not found");
+        return ResponseEntity.ok(todoItem);
     }
 }
 

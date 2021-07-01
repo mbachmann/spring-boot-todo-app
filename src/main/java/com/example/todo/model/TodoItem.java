@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.UUID;
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @Entity
 public class TodoItem {

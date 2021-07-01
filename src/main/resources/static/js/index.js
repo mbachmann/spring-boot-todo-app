@@ -55,6 +55,35 @@ function changeDoneState(ele) {
     });
 }
 
+function changeDoneStateFetch(ele) {
+    let itemId = $(ele).attr("id"); // get the item id!
+
+    fetch("/api/v1/state/" + itemId, {
+        method: 'PUT',
+        headers: {'Content-Type': 'application/json'},
+    }).then(response => {
+            if (response.status !== 200) { // analyze HTTP status of the response
+                new Error(`Error ${response.status}: ${response.statusText}`);
+            } else { // show the result
+                response.json().then(data =>  {
+                    let newListItem = $('<li/>')
+                        .attr("id", "item" + data.itemId);
+                    if (data.done) {
+                        newListItem.addClass('completed')
+                    }
+
+                    createTodoRow(newListItem, data);
+
+                    // Replace the old one by the new one
+                    let oldListItem = $("#item" + itemId);
+                    oldListItem.replaceWith(newListItem);
+                });
+            }
+        }).catch(err => {
+           new Error("Request failed " + err);
+    });
+}
+
 /**
  * Updates an existing todoItem in terms of taskName. The old item
  * is replaced in the todoList by the newItem from the backend.
@@ -178,7 +207,7 @@ function createTodoRow(parent, data) {
     // Check BOX
     let checkBoxAttr = $('<a/>')
         .attr("id", data.itemId) // to know item id!
-        .attr("onclick", "changeDoneState(this)")
+        .attr("onclick", "changeDoneStateFetch(this)")
         .addClass('todo-completed')
         .appendTo(todoRow);
 

@@ -84,6 +84,7 @@ public class TodoItemService {
 
 
     public TodoItem getItem(Long id) {
-        return todoItemRepository.findByItemId(id);
+        return todoItemRepository.findById(id).orElse(null);
+        // return todoItemRepository.findByItemId(id);
     }
 }
