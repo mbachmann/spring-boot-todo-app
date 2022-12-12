@@ -29,7 +29,7 @@ The difference to the original is a changed technology stack.
 the project has been created by using IntelliJ Ultimate edition.
 The technology stack consists of the following components:
 
-- Spring Boot (Version 2.5)
+- Spring Boot (Version 2.7.6)
 - Java Persistence API
 - Rest Controller
 - Thymeleaf Template Engine
@@ -79,12 +79,12 @@ Add the following libraries to the _pom.xml_ file:
   <dependency>
     <groupId>org.springdoc</groupId>
     <artifactId>springdoc-openapi-ui</artifactId>
-    <version>1.5.8</version>
+    <version>1.6.8</version>
   </dependency>
   <dependency>
     <groupId>mysql</groupId>
     <artifactId>mysql-connector-java</artifactId>
-    <version>8.0.23</version>
+    <version>8.0.29</version>
   </dependency>
 ```
 
@@ -1299,6 +1299,13 @@ $  docker push uportal/todo-app
 ```
 <br/>
 
+
+Alternative way for login:
+
+```
+cat ~/.key/my_password.txt | docker login --username uportal --password-stdin
+```
+
 Login to deployment platform with a container infrastructure:
 
 <br/>
@@ -1492,6 +1499,38 @@ services:
       - "traefik.port=8080"
       - "traefik.enable=true"
 
+    restart: always
+    networks:
+      - proxy
+    environment:
+      APP_NAME: Todo Rest with Spring Boot and H2
+      ACTIVE_PROFILES: dev,h2
+      APP_URL: https://todo-h2.united-portal.com
+
+```
+
+<br/>
+### Create a docker-compose-h2-traefik-v2.yml file
+
+For the reverse proxy traefik version 2 a new set of labels is neccessary: 
+
+```yaml
+version: '2'
+
+
+networks:
+  proxy:
+    external: true
+
+services:
+
+  todo-app-h2:
+    image: uportal/todo-app:latest
+    labels:
+      - traefik.http.routers.blog.rule=Host(`todo-h2.united-portal.com`)
+      - traefik.http.routers.blog.tls=true
+      - traefik.http.routers.blog.tls.certresolver=lets-encrypt
+      - traefik.port=8080
     restart: always
     networks:
       - proxy
