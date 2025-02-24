@@ -9,10 +9,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 class GlobalRestControllerAdviceTest {
 
@@ -48,6 +48,18 @@ class GlobalRestControllerAdviceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         advice = new GlobalRestControllerAdvice();
+    }
+
+    @Test
+    void testProblemHandler() {
+        Throwable exception = new RuntimeException("Unexpected error occurred");
+
+        ResponseEntity<Problem> response = advice.problem(exception);
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertNotNull(response.getBody().getLogRef());
+        assertEquals("Problem occured", response.getBody().getMessage());
     }
 
     @Test
@@ -165,5 +177,28 @@ class GlobalRestControllerAdviceTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertNotNull(response.getBody());
         assertTrue(response.getBody().getErrors().contains("Invalid JSON"));
+    }
+
+    @Test
+    void testHandleResourceNotFound() {
+        ResourceNotFoundException exception = new ResourceNotFoundException("Item not found");
+
+        ResponseEntity<ErrorMessage> response = advice.handleResourceNotFound(exception);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Resource Not Found: Item not found", response.getBody().getErrors().get(0));
+    }
+
+    @Test
+    void testHandleResourceAlreadyExists() {
+        ResourceAlreadyExistsException exception = new ResourceAlreadyExistsException("Item already exists");
+
+        ResponseEntity<ErrorMessage> response = advice.handleResourceAlreadyExists(exception);
+
+        assertEquals(HttpStatus.CONFLICT, response.getStatusCode());
+        assertNotNull(response.getBody());
+        assertEquals("Conflict: Item already exists", response.getBody().getErrors().get(0));
+        assertEquals("Resource already exists", response.getBody().getErrors().get(1));
     }
 }
