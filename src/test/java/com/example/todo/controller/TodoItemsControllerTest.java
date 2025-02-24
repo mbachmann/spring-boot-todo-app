@@ -26,7 +26,7 @@ class TodoItemsControllerTest {
         String viewName = controller.showTodoItemsPage(listId, model);
 
         // Assert
-        assertThat(viewName).isEqualTo("todo-items");
+        assertThat(viewName).isEqualTo("one-todo-items-list");
         assertThat(model.getAttribute("listId")).isEqualTo(listId);
     }
 
@@ -41,6 +41,6 @@ class TodoItemsControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(model().attributeExists("listId"))
                 .andExpect(model().attribute("listId", "123"))
-                .andExpect(view().name("todo-items"));
+                .andExpect(view().name("one-todo-items-list"));
     }
 }
