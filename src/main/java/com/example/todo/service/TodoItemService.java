@@ -4,22 +4,46 @@ package com.example.todo.service;
 import com.example.todo.dto.TodoItemListsDTO;
 import com.example.todo.dto.TodoItemsDTO;
 import com.example.todo.model.TodoItem;
+import com.example.todo.model.TodoItemList;
+import com.example.todo.model.TodoListName;
 import com.example.todo.repository.TodoItemRepository;
+import com.example.todo.repository.TodoListNameRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class TodoItemService {
 
+    private final TodoItemRepository todoItemRepository;
+    private final TodoListNameRepository todoListNameRepository;
+
     @Autowired
-    private TodoItemRepository todoItemRepository;
+    public TodoItemService(TodoItemRepository todoItemRepository, TodoListNameRepository todoListNameRepository) {
+        this.todoItemRepository = todoItemRepository;
+        this.todoListNameRepository = todoListNameRepository;
+    }
 
     public TodoItem saveTodoItem(TodoItem item) {
+
+        Optional<TodoListName> tln = todoListNameRepository.findById(item.getListId());
+        if (tln.isEmpty()) {
+            long count = todoListNameRepository.count();
+            String formattedDate = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                    .withZone(ZoneId.systemDefault())
+                    .format(Instant.now());
+            todoListNameRepository.save(new TodoListName(item.getListId(), "New List " + (count + 1) + " from " + formattedDate));
+        }
         return todoItemRepository.save(item);
+
     }
 
     public TodoItem changeDoneStateForTodoItem(Long id) {
@@ -63,28 +87,80 @@ public class TodoItemService {
     public TodoItemListsDTO getTodoItemListIDs() {
         List<UUID> listIds = todoItemRepository.findDistinctListId();
         return new TodoItemListsDTO(listIds.size(), listIds);
-
     }
 
     /**
-     * Return a DTO containing a list of todoLists including a count
+     * Return a DTO containing a list of todoLists including a count, name, from and to Date
      *
-     * @return the TodoItemListsDTO
+     * @return the List<TodoItemsDTO>
      */
     public List<TodoItemsDTO> getTodoItemLists() {
         List<TodoItemsDTO> todoItemsDTOs = new ArrayList<>();
-        List<UUID> listIds = todoItemRepository.findDistinctListId();
+        List<TodoItem> todoItems = todoItemRepository.findAll();
+        List<TodoItemList> todoListDetails = todoItemRepository.getAllTodoListDetails();
+        List<TodoListName> todoListNames = todoListNameRepository.findAll();
 
-        listIds.forEach(listId -> {
-            List<TodoItem> todoItems = this.getAllTodoItemsForListId(listId);
-            todoItemsDTOs.add(new TodoItemsDTO(todoItems.size(), listId, todoItems));
+        todoListNames.forEach(todoListName -> {
+            List<TodoItem> todoItemsForOneList = todoItems.stream().filter(ti -> ti.getListId().equals(todoListName.getId())).toList();
+            todoListDetails.stream().filter(til -> til.getListId().equals(todoListName.getId())).findFirst()
+                    .ifPresentOrElse(todoListDetail -> {
+                        todoItemsDTOs.add(new TodoItemsDTO(
+                                todoItemsForOneList.size(),
+                                todoListDetail.getListId(),
+                                todoListDetail.getFromDate(),
+                                todoListDetail.getToDate(),
+                                todoListName.getName(),
+                                todoItemsForOneList));
+                    }, () -> {
+                        todoItemsDTOs.add(new TodoItemsDTO(
+                                todoItemsForOneList.size(),
+                                todoListName.getId(),
+                                null,
+                                null,
+                                todoListName.getName(),
+                                todoItemsForOneList));
+                    });
         });
         return todoItemsDTOs;
+    }
+
+    /**
+     * Return a DTO containing a list of todoLists including a count, name, from and to Date
+     *
+     * @return the TodoItemsDTO
+     */
+    public TodoItemsDTO getTodoItemList(UUID listId) {
+        TodoItemsDTO todoItemsDTO = new TodoItemsDTO();
+        todoListNameRepository.findById(listId).ifPresent(todoListName -> {
+            List<TodoItem> todoItems = todoItemRepository.findByListId(listId);
+            todoItemRepository.findTodoListDetailsByListId(listId).ifPresentOrElse(todoListDetail -> {
+                todoItemsDTO.setCount(todoItems.size());
+                todoItemsDTO.setListId(listId);
+                todoItemsDTO.setFromDate(todoListDetail.getFromDate());
+                todoItemsDTO.setToDate(todoListDetail.getToDate());
+                todoItemsDTO.setListName(todoListName.getName());
+                todoItemsDTO.setTodoItemList(todoItems);
+
+            }, () -> {
+                todoItemsDTO.setCount(todoItems.size());
+                todoItemsDTO.setListId(listId);
+                todoItemsDTO.setFromDate(null);
+                todoItemsDTO.setToDate(null);
+                todoItemsDTO.setListName(todoListName.getName());
+                todoItemsDTO.setTodoItemList(todoItems);
+            });
+        });
+        return todoItemsDTO;
     }
 
 
     public TodoItem getItem(Long id) {
         return todoItemRepository.findById(id).orElse(null);
         // return todoItemRepository.findByItemId(id);
+    }
+
+    @Transactional
+    public void deleteByListId(UUID listId) {
+        todoItemRepository.deleteByListId(listId);
     }
 }

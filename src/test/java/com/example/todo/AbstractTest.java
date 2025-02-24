@@ -2,23 +2,22 @@ package com.example.todo;
 
 import com.example.todo.model.TodoItem;
 import com.example.todo.repository.TodoItemRepository;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
+import java.time.Instant;
 import java.util.*;
 
 @SpringBootTest
@@ -37,14 +36,14 @@ public abstract class AbstractTest {
     protected void createTodoTestItems(TodoItemRepository todoItemRepository) {
         UUID uuidList1 = UUID.randomUUID();
         for (int i = 0; i < 2 ; i ++) {
-            TodoItem todoItem = new TodoItem(uuidList1, "Todo List 1" + i, new Date());
+            TodoItem todoItem = new TodoItem(uuidList1, "Todo List 1" + i, Instant.now());
             todoItems.add(todoItem);
             todoItemRepository.save(todoItem);
         }
 
         UUID uuidList2 = UUID.randomUUID();
         for (int i = 0; i < 2 ; i ++) {
-            TodoItem todoItem = new TodoItem(uuidList2, "Todo Liste 2" + i, new Date());
+            TodoItem todoItem = new TodoItem(uuidList2, "Todo Liste 2" + i, Instant.now());
             todoItems.add(todoItem);
             todoItemRepository.save(todoItem);
         }

@@ -1,29 +1,24 @@
 package com.example.todo.dto;
 
-import com.example.todo.model.TodoItem;
-
 import java.time.Instant;
-import java.util.List;
 import java.util.UUID;
 
-public class TodoItemsDTO {
+public class TodoListNameDTO {
 
     private int count;
     private UUID listId;
     private Instant fromDate;
     private Instant toDate;
     private String listName;
-    private List<TodoItem> todoItemList;
 
-    public TodoItemsDTO(){}
+    public TodoListNameDTO(){}
 
-    public TodoItemsDTO(int count, UUID listId, Instant fromDate, Instant toDate, String listName, List<TodoItem> todoItemList){
+    public TodoListNameDTO(int count, UUID listId, Instant fromDate, Instant toDate, String listName){
         this.count = count;
         this.listId = listId;
         this.fromDate = fromDate;
         this.toDate = toDate;
         this.listName = listName;
-        this.todoItemList = todoItemList;
     }
 
     public int getCount() {
@@ -40,14 +35,6 @@ public class TodoItemsDTO {
 
     public void setListId(UUID listId) {
         this.listId = listId;
-    }
-
-    public List<TodoItem> getTodoItemList() {
-        return todoItemList;
-    }
-
-    public void setTodoItemList(List<TodoItem> todoItemList) {
-        this.todoItemList = todoItemList;
     }
 
     public Instant getFromDate() {

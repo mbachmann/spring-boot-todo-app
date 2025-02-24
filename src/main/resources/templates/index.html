@@ -1,42 +1,30 @@
-<!DOCTYPE HTML>
-<html xmlns:th="http://www.thymeleaf.org">
-
+<html>
 <head>
-    <meta charset="UTF-8"/>
-    <title>Create and share a check list just a second! Publist - Never miss a thing!</title>
-    <link rel="stylesheet" type="text/css" th:href="@{/css/style.css}"/>
-
-    <!--For jquery calling REST API-->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <!--For material icon-->
+    <meta charset="UTF-8">
+    <title>To-Do Lists</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="/js/utils.js"></script>
     <script src="/js/index.js"></script>
 </head>
-
 <body>
-
 <div class="todo-content">
-    <h1 class="page-title"> My Todo </h1>
-
+    <h1 class="page-title">To-Do Lists</h1>
     <div class="todo-create">
-        <!--Create a text box and handle ENTER to create item-->
         <form action="#">
-            <input type="text" id="taskNameTextField" class="form-control" onkeypress="handleEnterKey(event)"
-                   placeholder="Input task name then tap Enter to add">
+            <input type="text" id="listNameTextField" class="form-control" onkeypress="handleEnterKey(event)"
+                   placeholder="Input new List Name then tap Enter to add">
         </form>
     </div>
 
-    <!-- contains the list with the todoItems -->
-    <ul class="todo-list">
-    </ul>
-
-    <!-- First grab an UUID from backend ... listId is added at Java MainController -->
-    <script th:inline="javascript">
-        /*<![CDATA[*/
-        let glistId = /*[[${listId}]]*/
-        /*]]>*/
-    </script>
+    <ul class="todo-list"></ul>
 </div>
-</body>
 
+<script>
+    $(document).ready(function() {
+        loadLists();
+    });
+</script>
+</body>
 </html>

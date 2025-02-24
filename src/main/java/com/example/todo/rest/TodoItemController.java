@@ -5,30 +5,34 @@ import com.example.todo.dto.TodoItemsDTO;
 import com.example.todo.model.TodoItem;
 import com.example.todo.rest.advice.ResourceNotFoundException;
 import com.example.todo.service.TodoItemService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.*;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1")
 public class TodoItemController {
-    @Autowired
-    private TodoItemService todoItemService;
+
+
+
+    private final TodoItemService todoItemService;
+
+    public TodoItemController(TodoItemService todoItemService) {
+        this.todoItemService = todoItemService;
+    }
 
     @GetMapping("/item/{itemId}")
     public TodoItem getItem(@PathVariable Long itemId) {
         TodoItem  todoItem = todoItemService.getItem(itemId);
         if (todoItem == null) throw new ResourceNotFoundException("List item with id=" + itemId + " not found");
         return todoItem;
-
     }
 
     // Get todo list, based on listId
     @GetMapping("/list/{listId}")
-    public List<TodoItem> getItem(@PathVariable UUID listId) {
+    public List<TodoItem> getItemsOfOneList(@PathVariable UUID listId) {
         return todoItemService.getAllTodoItemsForListId(listId);
     }
 

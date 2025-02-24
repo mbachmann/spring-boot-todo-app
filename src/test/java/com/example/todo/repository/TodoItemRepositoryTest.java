@@ -2,7 +2,9 @@ package com.example.todo.repository;
 
 import com.example.todo.AbstractTest;
 import com.example.todo.model.TodoItem;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -29,13 +31,13 @@ public class TodoItemRepositoryTest extends AbstractTest {
 
 
     @Test
-    public void getTodoItemList() throws Exception {
+    public void getAllTodoListDetails() throws Exception {
         List<TodoItem> todoItems = todoItemRepository.findAll();
         assertTrue(todoItems.size() > 0);
     }
 
     @Test
-    public void getTodoItemLists() throws Exception {
+    public void getAllTodoListsDetails() throws Exception {
         List<UUID> listIds = todoItemRepository.findDistinctListId();
         assertTrue(listIds.size() > 0);
     }

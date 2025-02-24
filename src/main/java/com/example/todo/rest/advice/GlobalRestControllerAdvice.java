@@ -1,6 +1,8 @@
 package com.example.todo.rest.advice;
 
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -17,8 +19,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -27,13 +27,13 @@ import java.util.UUID;
 
 @ControllerAdvice
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-public class GlobalControllerAdvice //extends ResponseEntityExceptionHandler
+public class GlobalRestControllerAdvice //extends ResponseEntityExceptionHandler
 {
     /**
      * Note use base class if you wish to leverage its handling.
      * Some code will need changing.
      */
-    private static final Logger logger = LoggerFactory.getLogger(GlobalControllerAdvice.class);
+    private static final Logger logger = LoggerFactory.getLogger(GlobalRestControllerAdvice.class);
 
     @ExceptionHandler(Throwable.class)
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)

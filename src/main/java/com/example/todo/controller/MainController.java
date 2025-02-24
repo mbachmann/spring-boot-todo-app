@@ -1,12 +1,20 @@
 package com.example.todo.controller;
 
-import java.util.UUID;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+
+import java.util.UUID;
 
 @Controller
 public class MainController {
+
+    /**
+     * This method is used to return the index page.
+     * @param model Model object to pass data to the view.
+     * @return index in order to load index.html from the templates' folder.
+     */
     @RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
     public String index(Model model)
     {

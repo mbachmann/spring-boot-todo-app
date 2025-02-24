@@ -1,14 +1,22 @@
 package com.example.todo.model;
 
-import java.util.Date;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotEmpty;
+
+import java.time.Instant;
 import java.util.UUID;
-import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+
 
 @Entity
 public class TodoItem {
 
+    public TodoItem() {}
+
+    public TodoItem(UUID listId, String taskName, Instant createdAt) {
+        this.listId = listId;
+        this.taskName = taskName;
+        this.createdAt = createdAt;
+    }
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
@@ -20,17 +28,9 @@ public class TodoItem {
     @NotEmpty(message="* Enter Task Name")
     private String taskName;
 
-    public TodoItem() {}
-
-    public TodoItem(UUID listId, String taskName, Date createdAt) {
-        this.listId = listId;
-        this.taskName = taskName;
-        this.createdAt = createdAt;
-    }
-
     private Boolean isDone = false; // Default value
 
-    private Date createdAt = new Date();
+    private Instant createdAt = Instant.now();
 
     public Long getItemId() {
         return itemId;
@@ -56,6 +56,7 @@ public class TodoItem {
         this.taskName = taskName;
     }
 
+
     public Boolean getDone() {
         return isDone;
     }
@@ -64,11 +65,11 @@ public class TodoItem {
         isDone = done;
     }
 
-    public Date getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(Instant createdAt) {
         this.createdAt = createdAt;
     }
 }

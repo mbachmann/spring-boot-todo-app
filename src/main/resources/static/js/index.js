@@ -6,165 +6,150 @@
 function handleEnterKey(e) {
     if (e.keyCode === 13) {
         e.preventDefault(); // Ensure it is only this code that run
-        let taskName = document.getElementById('taskNameTextField').value
+        let listName = document.getElementById('listNameTextField').value
         // Clear input field!
-        let taskNameTextField = $("#taskNameTextField");
-        taskNameTextField.val('');
+        let listNameTextField = $("#listNameTextField");
+        listNameTextField.val('');
 
         // Check if we are editing or not!
-        let isEditing = taskNameTextField.attr("isEditing");
+        let isEditing = listNameTextField.attr("isEditing");
 
         if (isEditing) {
             // clear editing flag.
-            taskNameTextField.removeAttr("isEditing");
-            let itemId = taskNameTextField.attr("editingItemId");
-            taskNameTextField.removeAttr("editingItemId");
-            putEditTodoItem(itemId, taskName, glistId);
+            listNameTextField.removeAttr("isEditing");
+            let itemId = listNameTextField.attr("editingItemId");
+            listNameTextField.removeAttr("editingItemId");
+            putEditTodoList(itemId, listName);
         } else {
-            postNewTodoItem(taskName, glistId);
+            postNewTodoList(listName);
         }
     }
 }
 
 /**
- * Handles the change of the todoItem status
- * @param ele the todoItem
+ * Post a new todoList to the backend
+ * @param listName the name of the list
  */
-function changeDoneState(ele) {
-    let itemId = $(ele).attr("id"); // get the item id!
-    $.ajax({
-        type: "PUT",
-        url: "/api/v1/state/" + itemId,
-        success: function (data) {
-            // Create new list item
-            let newListItem = $('<li/>')
-                .attr("id", "item" + data.itemId);
+function postNewTodoList(listName) {
 
-            if (data.done) {
-                newListItem.addClass('completed')
-            }
+    if (listName) {
 
-            createTodoRow(newListItem, data);
-
-            // Replace the old one by the new one
-            let oldListItem = $("#item" + itemId);
-            oldListItem.replaceWith(newListItem);
-        },
-        error: function (data) {
-        }
-    });
-}
-
-function changeDoneStateFetch(ele) {
-    let itemId = $(ele).attr("id"); // get the item id!
-
-    fetch("/api/v1/state/" + itemId, {
-        method: 'PUT',
-        headers: {'Content-Type': 'application/json'},
-    }).then(response => {
-            if (response.status !== 200) { // analyze HTTP status of the response
-                new Error(`Error ${response.status}: ${response.statusText}`);
-            } else { // show the result
-                response.json().then(data =>  {
-                    let newListItem = $('<li/>')
-                        .attr("id", "item" + data.itemId);
-                    if (data.done) {
-                        newListItem.addClass('completed')
-                    }
-
-                    createTodoRow(newListItem, data);
-
-                    // Replace the old one by the new one
-                    let oldListItem = $("#item" + itemId);
-                    oldListItem.replaceWith(newListItem);
-                });
-            }
-        }).catch(err => {
-           new Error("Request failed " + err);
-    });
+        $.ajax({
+            type: "POST",
+            url: "/api/v1/todolist-names",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            data: JSON.stringify({id: crypto.randomUUID(), name: listName}),
+            success: function (data) {
+                loadLists();
+            },
+        });
+    }
 }
 
 /**
- * Updates an existing todoItem in terms of taskName. The old item
- * is replaced in the todoList by the newItem from the backend.
- * @param itemId    the todoItem id
- * @param taskName  the name of the task to do
- * @param listId    the listId as UUID
+ * Updates the todoList in the backend
+ * @param listId the id of a list item
+ * @param listName the new name of the list
  */
-function putEditTodoItem(itemId, taskName, listId) {
-    let todoItem = {
-        itemId: itemId,
-        taskName: taskName,
-        listId: listId
-    };
-    let requestJSON = JSON.stringify(todoItem);
-    $.ajax({
-        type: "PUT",
-        url: "/api/v1/edit",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        data: requestJSON,
-        success: function (data) {
-            // Create new list item
-            let newListItem = $('<li/>')
-                .attr("id", "item" + data.itemId);
+function putEditTodoList(listId, listName) {
+    if (listName) {
 
-            if (data.done) {
-                newListItem.addClass('completed')
+        $.ajax({
+            type: "PUT",
+            url: "/api/v1/todolist-names/" + listId,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            data: JSON.stringify({id: listId, name: listName}),
+            success: function (data) {
+                getAndCreateTodoListRow(data.id);
+
+            },
+            error: function (data) {
+                console.log("error at ajax call:", data);
             }
-
-            createTodoRow(newListItem, data);
-
-            // Replace the old one by the new one
-            let oldListItem = $("#item" + data.itemId);
-            oldListItem.replaceWith(newListItem);
-        },
-        error: function (data) {
-        }
-    });
+        });
+    }
 }
 
 /**
- * Saves a new todoItem in the backend and creates a list item in the ul list
- * @param taskName the entered task name
- * @param listId   the unique list id with an UUID
+ * Load the todoLists from the backend and creates the list
  */
-function postNewTodoItem(taskName, listId) {
-    let newTodoItem = {
-        taskName: taskName,
-        listId: listId
-    };
-    let requestJSON = JSON.stringify(newTodoItem);
-    $.ajax({
-        type: "POST",
-        url: "/api/v1/new",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        data: requestJSON,
-        success: function (data) {
-            let cList = $('ul.todo-list');
+function loadLists() {
+    $.get("/api/v1/todolist-names", function (data) {
+        let cList = $('ul.todo-list');
+        cList.empty();
+        data.forEach(item => {
+
             let li = $('<li/>')
-                .attr("id", "item" + data.itemId)
+                .attr("id", "item" + item.listId)
                 .appendTo(cList);
+            console.log(item)
+            createTodoListRow(li, item);
 
-            createTodoRow(li, data);
-        },
-        error: function (data) {
-        }
+        });
     });
 }
 
 /**
- * Deletes a todoItem in the backend and deletes it from the list
- * @param ele the list todoItem
+ * Creates a row in the todoNameList
+ * The line consists of an id,list name, a span with edit icon and delete icon
+ * @param parent The parent HTML element
+ * @param data consist of count, fromDate, listId, listName, toDate, fromDate
+ *
  */
-function deleteTodoItem(ele) {
+function createTodoListRow(parent, data) {
+    let todoListRow = $('<div/>')
+        .addClass('todo-list-row')
+        .appendTo(parent)
+
+
+    // List Name
+    let todoTitle = $('<a/>')
+        .attr("href", "/todo-items?listId=" + data.listId)
+        .addClass('todo-list-name-item')
+        .text(data.listName)
+        .appendTo(todoListRow);
+
+    // Actions
+    let todoActions = $('<span/>')
+        .addClass('todo-actions')
+        .appendTo(todoListRow)
+
+    // Edit icon
+    let editAttr = $('<a/>')
+        .attr("id", data.listId) // to know item id!
+        .attr("onclick", "editTodoListName(this)")
+        .appendTo(todoActions);
+
+    let editIcon = $('<i/>')
+        .addClass('material-icons')
+        .text('edit')
+        .appendTo(editAttr);
+
+    // Delete icon
+    let deleteAttr = $('<a/>')
+        .attr("id", data.listId) // to know item id!
+        .attr("onclick", "deleteTodoList(this)")
+        .appendTo(todoActions);
+
+    let deleteIcon = $('<i/>')
+        .addClass('material-icons')
+        .text('delete')
+        .appendTo(deleteAttr);
+}
+
+/**
+ * Deletes a todoList in the backend and deletes it from the list
+ * @param ele one list item int the todoLists
+ */
+function deleteTodoList(ele) {
     let itemId = $(ele).attr("id"); // get the item id!
     $.ajax({
         type: "DELETE",
-        url: "/api/v1/delete/" + itemId,
+        url: "/api/v1/todolist-names/" + itemId,
         success: function (data) {
             let oldItem = $("#item" + itemId);
             cuteHide(oldItem);
@@ -175,88 +160,38 @@ function deleteTodoItem(ele) {
 }
 
 /**
- * Take the taskName ("todoTitle") from the list and copy it the the taskNameTextField
- * @param ele the edit a-tag from the list todoItem
+ * Take the List Name ("todo-list-name-item") from the list and copy it the the listNameTextField
+ * @param ele one list item int the todoLists
  */
-function editTodoItem(ele) {
+function editTodoListName(ele) {
     // first get item id
     let itemId = $(ele).attr("id");
     // then get list item we created before.
     let listItem = $("#item" + itemId);
-    let titleSpan = listItem.find(".todo-title");
+    let titleLink = listItem.find(".todo-list-name-item");
 
     // set the text field
-    let taskNameTextField = $("#taskNameTextField");
-    taskNameTextField.val(titleSpan.text());
+    let listNameTextField = $("#listNameTextField");
+    listNameTextField.val(titleLink.text());
     // set the attribute that we are editing!
-    taskNameTextField.attr("isEditing", true);
-    taskNameTextField.attr("editingItemId", itemId);
+    listNameTextField.attr("isEditing", true);
+    listNameTextField.attr("editingItemId", itemId);
 }
 
 /**
- * Creates a row in the todoList
- * The line consists of an id, checkbox, task name, a span with edit icon and delete icon
- * @param parent
- * @param data
+ * Get the todoList from the backend and updates the list
+ * @param listId the id of one list item
  */
-function createTodoRow(parent, data) {
-    let todoRow = $('<div/>')
-        .addClass('todo-row')
-        .appendTo(parent)
+function getAndCreateTodoListRow(listId) {
+    $.get("/api/v1/todolist-names/" + listId, function (data) {
+        console.log("getAndCreateTodoListRow", listId, data);
+        let newListItem = $('<li/>')
+            .attr("id", "item" + data.listId);
 
-    // Check BOX
-    let checkBoxAttr = $('<a/>')
-        .attr("id", data.itemId) // to know item id!
-        .attr("onclick", "changeDoneStateFetch(this)")
-        .addClass('todo-completed')
-        .appendTo(todoRow);
+        createTodoListRow(newListItem, data);
 
-    let checkBoxIcon = $('<i/>')
-        .addClass('material-icons toggle-completed-checkbox')
-        .appendTo(checkBoxAttr);
-
-    // Task Name
-    let todoTitle = $('<span/>')
-        .addClass('todo-title')
-        .text(data.taskName)
-        .appendTo(todoRow);
-
-    // Actions
-    let todoActions = $('<span/>')
-        .addClass('todo-actions')
-        .appendTo(todoRow)
-
-    // Edit icon
-    let editAttr = $('<a/>')
-        .attr("id", data.itemId) // to know item id!
-        .attr("onclick", "editTodoItem(this)")
-        .appendTo(todoActions);
-
-    let editIcon = $('<i/>')
-        .addClass('material-icons')
-        .text('edit')
-        .appendTo(editAttr);
-
-    // Delete icon
-    let deleteAttr = $('<a/>')
-        .attr("id", data.itemId) // to know item id!
-        .attr("onclick", "deleteTodoItem(this)")
-        .appendTo(todoActions);
-
-    let deleteIcon = $('<i/>')
-        .addClass('material-icons')
-        .text('delete')
-        .appendTo(deleteAttr);
-}
-
-/**
- * For animation during delete
- * @param el the li element
- */
-function cuteHide(el) {
-    el.animate({opacity: '0'}, 300, function () {
-        el.animate({height: '0px'}, 300, function () {
-            el.remove();
-        });
+        // Replace the old one by the new one
+        let oldListItem = $("#item" + data.listId);
+        oldListItem.replaceWith(newListItem);
     });
 }
