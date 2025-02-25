@@ -13,7 +13,7 @@ public class MainController {
     /**
      * This method is used to return the index page.
      * @param model Model object to pass data to the view.
-     * @return index in order to load index.html from the templates' folder.
+     * @return index in order to load index-template.html from the templates' folder.
      */
     @RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
     public String index(Model model)
@@ -21,6 +21,6 @@ public class MainController {
         // When people visit site, create an UUID for a list and return it.
         UUID uuid = UUID.randomUUID();
         model.addAttribute("listId", uuid.toString());
-        return "index";
+        return "index-template";
     }
 }
