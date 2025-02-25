@@ -12,9 +12,22 @@
    <artifactId>todo</artifactId>
    <version>0.0.1-SNAPSHOT</version>
    <name>todo</name>
+   <url/>
+   <licenses>
+      <license/>
+   </licenses>
+   <developers>
+      <developer/>
+   </developers>
+   <scm>
+      <connection>scm:git:https://github.com/mbachmann/spring-boot-todo-app</connection>
+      <developerConnection>scm:git:https://github.com/mbachmann/spring-boot-todo-app</developerConnection>
+      <url>https://github.com/mbachmann/spring-boot-todo-app</url>
+   </scm>
    <description>Demo project for Spring Boot</description>
    <properties>
       <java.version>21</java.version>
+      <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
    </properties>
    <dependencies>
       <dependency>
@@ -41,9 +54,9 @@
          <scope>runtime</scope>
       </dependency>
       <dependency>
-         <groupId>mysql</groupId>
-         <artifactId>mysql-connector-java</artifactId>
-         <version>8.0.33</version>
+         <groupId>com.mysql</groupId>
+         <artifactId>mysql-connector-j</artifactId>
+         <scope>runtime</scope>
       </dependency>
 
 
@@ -62,6 +75,11 @@
          <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
          <version>2.8.5</version>
       </dependency>
+      <dependency>
+         <groupId>org.apache.maven</groupId>
+         <artifactId>maven-model</artifactId>
+         <version>3.9.6</version>
+      </dependency>
    </dependencies>
 
    <build>
@@ -69,38 +87,6 @@
          <plugin>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>
-         </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>buildnumber-maven-plugin</artifactId>
-            <version>3.0.0</version>
-            <executions>
-               <execution>
-                  <phase>validate</phase>
-                  <goals>
-                     <goal>create</goal>
-                  </goals>
-               </execution>
-            </executions>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <version>3.3.1</version>
-            <executions>
-               <execution>
-                  <id>filter-resources</id>
-                  <phase>process-resources</phase>
-                  <goals>
-                     <goal>resources</goal>
-                  </goals>
-                  <configuration>
-                     <filters>
-                        <filter>src/main/resources/version.properties</filter>
-                     </filters>
-                  </configuration>
-               </execution>
-            </executions>
          </plugin>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
