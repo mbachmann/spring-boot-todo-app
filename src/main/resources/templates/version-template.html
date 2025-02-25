@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Application Version Info</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+
+<div class="todo-content">
+    <button onclick="window.location.href='/index'">Home</button>
+    <h1 class="page-title">Version Information</h1>
+    <ul>
+        <li>Application Version: <span th:text="${projectVersion}"></span></li>
+        <li>Spring Boot Version: <span th:text="${springBootVersion}"></span></li>
+        <li>Java Version: <span th:text="${javaVersion}"></span></li>
+        <li>SpringDoc Version: <span th:text="${springDocVersion}"></span></li>
+    </ul>
+</div>
+</body>
+</html>
