@@ -1,6 +1,131 @@
-# Todo App Spring Boot Thymeleaf REST jQuery
+# Spring Boot To-Do List Application
 
-A single page application by using JSON with jQuery.
+## Overview
+
+This is a Spring Boot MVC application for managing To-Do lists and their items. The frontend is implemented using Thymeleaf and jQuery, while the backend exposes a REST API for managing To-Do lists and items.
+
+## Features
+
+- **To-Do List Management:**
+    - Create, rename, and delete To-Do lists.
+    - View all To-Do lists on the main page.
+- **To-Do Item Management:**
+    - View, add, edit, and delete items within a selected To-Do list.
+    - Toggle the completion status of items.
+- **Navigation:**
+    - Click on a To-Do list to navigate to its items page.
+    - A back button allows returning to the main page.
+- **Testing:**
+    - Comprehensive unit tests for controllers and services.
+
+## Technologies Used
+
+- **Backend:** Spring Boot, Spring MVC, Spring Data JPA
+- **Frontend:** Thymeleaf, jQuery, HTML, CSS
+- **Database:** H2 (in-memory, for development/testing)
+- **API Specification:** OpenAPI
+- **Testing:** JUnit, Mockito
+- **Containerization:** Docker
+
+## Installation
+
+### Prerequisites
+
+- Java 17+
+- Maven 3.8+
+- Docker (for containerized deployment)
+
+### Step 1: Clone the Repository
+
+```sh
+git clone https://github.com/mbachmann/spring-boot-todo-app.git
+cd spring-boot-todo-app
+```
+
+### Step 2: Build the Backend
+
+Compile and package the Spring Boot application:
+
+```sh
+mvn clean install
+```
+
+Run the application locally:
+
+```sh
+mvn spring-boot:run
+```
+
+The application will start on `http://localhost:8080/`.
+
+### Step 3: Build the Frontend
+
+The frontend is integrated with Thymeleaf templates and does not require a separate build step. Ensure the application is running, and access it via the browser at `http://localhost:8080/`.
+
+### Step 4: Run Tests
+
+Execute unit tests using:
+
+```sh
+mvn test
+```
+
+### Step 5: Deploy with Docker
+
+To build and run the application in a Docker container:
+
+```sh
+docker build -t spring-boot-todo-app .
+docker run -p 8080:8080 spring-boot-todo-app
+```
+
+## Usage
+
+### Main Page (`index.html`)
+
+- Displays all To-Do lists.
+- Buttons to create, rename, and delete To-Do lists.
+- Clicking a list navigates to its items page.
+
+### To-Do Items Page (`todo-items.html`)
+
+- Displays all items of a selected To-Do list.
+- Options to add, edit, delete, and mark items as done.
+- Back button to return to the main page.
+
+## API Endpoints
+
+### To-Do Lists
+- `GET /api/v1/todolist-names` - Retrieve all To-Do list names.
+- `GET /api/v1/todolist-names/{id}` - Retrieve a specific To-Do list name.
+- `POST /api/v1/todolist-names` - Create a new To-Do list name.
+- `PUT /api/v1/todolist-names/{id}` - Rename a To-Do list name.
+- `DELETE /api/v1/todolist-names/{id}` - Delete a To-Do list name.
+
+### To-Do Items
+- `GET /api/v1/todo-items/item/{itemId}` - Retrieve a specific item.
+- `GET /api/v1/todo-items/list/{listId}` - Retrieve items of a list.
+- `GET /api/v1/todo-items/listids` - Retrieve all To-Do list IDs.
+- `GET /api/v1/todo-items/list` - Retrieve all To-Do lists.
+- `POST /api/v1/todo-items/new` - Add a new item.
+- `PUT /api/v1/todo-items/edit` - Edit an item.
+- `DELETE /api/v1/todo-items/delete/{id}` - Delete an item.
+- `PUT /api/v1/todo-items/state/{id}` - Toggle an item's completion status.
+
+## Contribution
+
+Contributions are welcome! Please fork the repository and create a pull request with your improvements.
+
+## License
+
+This project is licensed under the MIT License.
+
+## Author
+
+Maintained by [mbachmann](https://github.com/mbachmann).
+
+
+
 
 Content
 
@@ -52,7 +177,7 @@ _Spring Initializr_ generates a valid project structure with the following files
 - An empty _JUnit_ test class.
 - An empty Spring application configuration file: _application.properties_
 
-Choose Java SDK (can 8, 11, 14, etc):
+Choose Java SDK (can be 17, 21, etc):
 
 <br/>
 
@@ -78,14 +203,76 @@ Add the following libraries to the _pom.xml_ file:
      <!-- Open API  -->
   <dependency>
     <groupId>org.springdoc</groupId>
-    <artifactId>springdoc-openapi-ui</artifactId>
-    <version>1.6.8</version>
+    <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+    <version>2.8.5</version>
   </dependency>
   <dependency>
     <groupId>mysql</groupId>
     <artifactId>mysql-connector-java</artifactId>
-    <version>8.0.29</version>
+    <version>8.0.33</version>
   </dependency>
+```
+
+For the testing we need the ability for creating Mocks. We have to add Mockito the _pom.xml_:
+
+```xml
+  <dependency>
+    <groupId>org.mockito</groupId>
+    <artifactId>mockito-core</artifactId>
+    <scope>test</scope>
+  </dependency>
+```
+
+Mockito requires a plugin:
+
+```xml
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-surefire-plugin</artifactId>
+  <configuration>
+    <argLine>
+      -javaagent:${settings.localRepository}/org/mockito/mockito-core/${mockito.version}/mockito-core-${mockito.version}.jar
+      -Xshare:off
+    </argLine>
+  </configuration>
+</plugin>
+```
+
+For the extraction of version information we need 2 more plugins:
+
+```xml
+<plugin>
+  <groupId>org.codehaus.mojo</groupId>
+  <artifactId>buildnumber-maven-plugin</artifactId>
+  <version>3.0.0</version>
+  <executions>
+    <execution>
+      <phase>validate</phase>
+        <goals>
+          <goal>create</goal>
+       </goals>
+    </execution>
+  </executions>
+</plugin>
+<plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-resources-plugin</artifactId>
+  <version>3.3.1</version>
+  <executions>
+    <execution>
+      <id>filter-resources</id>
+      <phase>process-resources</phase>
+      <goals>
+        <goal>resources</goal>
+      </goals>
+      <configuration>
+        <filters>
+          <filter>src/main/resources/version.properties</filter>
+        </filters>
+      </configuration>
+    </execution>
+   </executions>
+</plugin>
 ```
 
 **Do not forget the maven refresh!!**
@@ -100,7 +287,7 @@ The spring-boot plugin allows to start the project.
 
 ## The project structure
 
-The structure of the project consists of files for the backend in main/java and files for the web application
+The final structure of the project consists of files for the backend in main/java and files for the web application
 in resources folder. The project has beside the basic profile three additional spring profiles (dev, h2 and mysql).
 The _Dockerfile_ allows you to create a deployable container. The docker-compose files are demonstrating how to configure
 and orchestrate the containers.
@@ -735,23 +922,22 @@ user gets its onw list.
 
 In controllers folder, adding MainController.java.
 
-
 ```java
 import java.util.UUID;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
 @Controller
 public class MainController {
-    @RequestMapping(value = { "/", "/index" }, method = RequestMethod.GET)
-    public String index(Model model)
-    {
-        // When people visit site, create an UUID for a list and return it.
-        UUID uuid = UUID.randomUUID();
-        model.addAttribute("listId", uuid.toString());
-        return "index";
-    }
+  @RequestMapping(value = {"/", "/index"}, method = RequestMethod.GET)
+  public String index(Model model) {
+    // When people visit site, create an UUID for a list and return it.
+    UUID uuid = UUID.randomUUID();
+    model.addAttribute("listId", uuid.toString());
+    return "index-template";
+  }
 }
 
 ```
