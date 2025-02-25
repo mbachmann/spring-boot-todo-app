@@ -21,7 +21,8 @@ table th, table td {
 }
 
 body {
-    font-size: 18px;
+    font-size: 16px;
+    font-family: sans-serif;
     line-height: 1.58;
     background: #6699FF;
     background: -webkit-linear-gradient(to left, #336699, #228899);
@@ -113,7 +114,7 @@ input {
 
 .todo-content ul li {
     padding-top: 10px;
-    padding-bottom: 10px;
+    padding-bottom: 0;
     border-bottom: 1px solid #E8E8E8;
 }
 
