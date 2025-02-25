@@ -19,12 +19,12 @@ class MainControllerTest {
     void index_ShouldReturnIndexViewAndContainListId() throws Exception {
         mockMvc.perform(get("/"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("index"))
+                .andExpect(view().name("index-template"))
                 .andExpect(model().attributeExists("listId"));
 
         mockMvc.perform(get("/index"))
                 .andExpect(status().isOk())
-                .andExpect(view().name("index"))
+                .andExpect(view().name("index-template"))
                 .andExpect(model().attributeExists("listId"));
     }
 }
