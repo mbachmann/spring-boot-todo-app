@@ -21,6 +21,11 @@ public class DbPopulator implements HasLogger {
     private List<TodoListName> todoListNames;
     private List<TodoItem> todoItems;
 
+    private static final String PRIVATE_LIST = "To-Do List for private";
+    private static final String BUSINESS_LIST = "To-Do List for business";
+    private static final String HOMEWORK_LIST = "To-Do List for homework";
+    private static final String EMTPY_LIST = "An empty To-Do List";
+
 
     public DbPopulator(Environment environment, TodoListNameRepository todoListNameRepository, TodoItemRepository todoItemRepository) {
         this.environment = environment;
@@ -41,47 +46,61 @@ public class DbPopulator implements HasLogger {
     }
 
     private void createTodoListNames() {
-        getLogger().info("Init DB - create 3 TodoListNames");
+        getLogger().info("Init DB - create 4 TodoListNames");
         todoListNames = new ArrayList<>(Arrays.asList(
-                new TodoListName("To-Do List for business"),
-                new TodoListName("To-Do List for homework"),
-                new TodoListName("To-Do List for private"),
-                new TodoListName("An empty To-Do List")
+                new TodoListName(BUSINESS_LIST),
+                new TodoListName(HOMEWORK_LIST),
+                new TodoListName(PRIVATE_LIST),
+                new TodoListName(EMTPY_LIST)
         ));
-
-        todoListNameRepository.saveAll(todoListNames);
+        todoListNames.forEach(
+                tln -> todoListNameRepository.findByName(tln.getName()).stream().findFirst().ifPresentOrElse(
+                        found -> getLogger().info("Init DB - TodoListName already exists: {}", found.getName()),
+                        () -> todoListNameRepository.save(tln)));
+        todoListNames = todoListNameRepository.findAll();
     }
 
     private void createTodoListForBusiness() {
-        todoListNames.stream().filter(tln -> tln.getName().contains("business")).findFirst().ifPresent(tln -> {
+        todoListNames.stream().filter(tln -> tln.getName().equals(BUSINESS_LIST)).findFirst().ifPresent(tln -> {
             todoItems = new ArrayList<>(Arrays.asList(
                     new TodoItem(tln.getId(), "Create a project plan", Instant.now().minusSeconds(3600 * 24 * 10)),
                     new TodoItem(tln.getId(), "Refactor the project java code", Instant.now().minusSeconds(3600 * 24 * 5)),
                     new TodoItem(tln.getId(), "Organize a code review meeting", Instant.now().minusSeconds(3600 * 24 * 5))
             ));
-            todoItemRepository.saveAll(todoItems);
+            saveTodoItems(todoItems);
         });
     }
 
+
+
     private void createTodoListForHomework() {
-        todoListNames.stream().filter(tln -> tln.getName().contains("homework")).findFirst().ifPresent(tln -> {
+        todoListNames.stream().filter(tln -> tln.getName().equals(HOMEWORK_LIST)).findFirst().ifPresent(tln -> {
             todoItems = new ArrayList<>(Arrays.asList(
                     new TodoItem(tln.getId(), "Write a summary of the last lesson", Instant.now().minusSeconds(3600 * 24 * 10)),
                     new TodoItem(tln.getId(), "Code the Java homework", Instant.now().minusSeconds(3600 * 24 * 5)),
                     new TodoItem(tln.getId(), "Review the java solution code", Instant.now().minusSeconds(3600 * 24 * 5))
             ));
-            todoItemRepository.saveAll(todoItems);
+            saveTodoItems(todoItems);
         });
     }
 
     private void createTodoListForPrivate() {
-        todoListNames.stream().filter(tln -> tln.getName().contains("private")).findFirst().ifPresent(tln -> {
+        todoListNames.stream().filter(tln -> tln.getName().equals(PRIVATE_LIST)).findFirst().ifPresent(tln -> {
             todoItems = new ArrayList<>(Arrays.asList(
                     new TodoItem(tln.getId(), "Meet my friend in the city", Instant.now().minusSeconds(3600 * 24 * 10)),
                     new TodoItem(tln.getId(), "Go to grocery store", Instant.now().minusSeconds(3600 * 24 * 5)),
                     new TodoItem(tln.getId(), "Call Mam", Instant.now().minusSeconds(3600 * 24 * 5))
             ));
-            todoItemRepository.saveAll(todoItems);
+            saveTodoItems(todoItems);
+        });
+    }
+
+    private void saveTodoItems(List<TodoItem> todoItems) {
+        todoItems.forEach(todoItem -> {
+            todoItemRepository.findByTaskNameAndListId(todoItem.getTaskName(), todoItem.getListId()).stream().findFirst().ifPresentOrElse(
+                    found -> getLogger().info("Init DB - TodoItem already exists: {}", found.getTaskName()),
+                    () -> todoItemRepository.save(todoItem)
+            );
         });
     }
 }
