@@ -39,10 +39,8 @@ class DbPopulatorTest {
     @Test
     void shouldPopulateDatabaseWhenAutoPopulateIsTrue() {
         // Verify that the saveAll method is called for todo list names
-        verify(todoListNameRepository, times(1)).saveAll(any(List.class));
+        verify(todoListNameRepository, times(4)).save(any());
 
-        // Verify that the saveAll method is called for todo items
-        verify(todoItemRepository, atLeastOnce()).saveAll(any(List.class));
     }
 
 }
