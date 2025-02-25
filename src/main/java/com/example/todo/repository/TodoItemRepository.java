@@ -27,4 +27,7 @@ public interface TodoItemRepository extends JpaRepository<TodoItem, Long> {
 
     @Query("select  t.listId as listId, count(t.itemId) as count, min(t.createdAt) as fromDate, max(t.createdAt) as toDate  from TodoItem t where t.listId = :listId group by t.listId")
     Optional<TodoItemList> findTodoListDetailsByListId(UUID listId);
+
+    List<TodoItem> findByTaskName(String taskName);
+    List<TodoItem> findByTaskNameAndListId(String taskName, UUID listId);
 }
