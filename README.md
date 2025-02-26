@@ -1543,14 +1543,24 @@ The Dockerfile takes a slim _JDK11 image_, adds the _todo-*.jar_ file from the _
 <br/>
 
 ```dockerfile
-FROM openjdk:11-jdk-slim
+#
+# Build stage
+#
+FROM maven:3.9.5-eclipse-temurin-21-alpine AS build
+COPY src /home/app/src
+COPY pom.xml /home/app
+RUN mvn -DskipTests -f /home/app/pom.xml clean package
 
-ADD target/todo-*.jar app.jar
-
+#
+# Package stage
+#
+FROM openjdk:21-jdk-slim
+COPY --from=build /home/app/target/todo-*.jar /usr/local/lib/app.jar
 ARG JVM_OPTS
 ENV JVM_OPTS=${JVM_OPTS}
-
-CMD java ${JVM_OPTS} -jar app.jar
+# COPY chatapp.keystore.jks /
+EXPOSE 8080
+ENTRYPOINT ["java","-jar","/usr/local/lib/app.jar"]
 
 ```
 
