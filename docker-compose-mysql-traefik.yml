@@ -51,8 +51,8 @@ services:
       - "traefik.enable=true"
 
   todo-dbmysql8:
-    image: mysql:8.0.23
-    command: --default-authentication-plugin=mysql_native_password
+    image: mysql:8.4.4
+    command: mysqld --mysql-native-password=ON
     container_name: dbmysql8-todoappdb
     restart: always
     cap_add:
@@ -73,9 +73,9 @@ services:
       - '3306'
       # Where our data will be persisted
     volumes:
-      - dbmysql8-todoappdb:/var/lib/mysql
+      - dbmysql84-todoappdb:/var/lib/mysql
     networks:
       - internal
 # Names our volume
 volumes:
-  dbmysql8-todoappdb:
+  dbmysql84-todoappdb:
