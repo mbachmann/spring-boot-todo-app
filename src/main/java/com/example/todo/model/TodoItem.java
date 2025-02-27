@@ -2,6 +2,9 @@ package com.example.todo.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.Type;
+import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -22,7 +25,6 @@ public class TodoItem {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long itemId;
 
-    @Column(columnDefinition = "BINARY(16)")
     private UUID listId;
 
     @NotEmpty(message="* Enter Task Name")
