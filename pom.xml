@@ -49,8 +49,6 @@
       <dependency>
          <groupId>com.h2database</groupId>
          <artifactId>h2</artifactId>
-         <!-- version from spring boot is overridden because of security issues in release 1.4 -->
-         <version>2.1.212</version>
          <scope>runtime</scope>
       </dependency>
       <dependency>

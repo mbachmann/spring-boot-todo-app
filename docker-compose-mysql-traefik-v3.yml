@@ -1,6 +1,4 @@
 
-version: '3'
-
 networks:
   proxy:
     external: true
@@ -8,50 +6,49 @@ networks:
     external: false
 services:
 
-  todo-app-mysql:
+  todo-app-on-mysql:
     image: uportal/todo-app:latest
-
-    restart: always
+    container_name: todoapp-on-mysql-84
+    restart: unless-stopped
     environment:
       APP_NAME: Todo App with MySQL
       ACTIVE_PROFILES: dev,mysql
-      APP_URL: https://todo-app.united-portal.com
-      APP_DB_HOST: dbmysql8-todoappdb
+      APP_URL: https://todo-on-mysql.example.com # change hostname!
+      APP_DB_HOST: todoapp-mysql84-db
       APP_DB_PORT: 3306
       APP_DB_NAME: todoapp
       APP_DB_USERNAME: root
       APP_DB_PASSWORD: todoapp
-    ports:
-      - 8080:8080
     networks:
       - internal
       - proxy
     labels:
-      - "traefik.backend=todo-app"
-      - "traefik.frontend.rule=Host:todo-app.united-portal.com"
-      - "traefik.docker.network=proxy"
-      - "traefik.port=8080"
       - "traefik.enable=true"
+      - "traefik.http.routers.todo-on-mysql.rule=Host(`todo-on-mysql.example.com`)" # change hostname!
+      - "traefik.http.routers.todo-on-mysql.tls=true"
+      - "traefik.http.routers.todo-on-mysql.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.todo-on-mysql.entrypoints=websecure"
+      - "traefik.http.services.todo-on-mysql.loadbalancer.server.port=8080"
     depends_on:
       todo-dbmysql84:
         condition: service_healthy
 
   todo-adminer:
-    image: adminer:4.8.0
-    restart: always
-    ports:
-      - 9090:8080
+    image: adminer:4.17.1
+    container_name: todoapp-adminer-on-mysql
+    restart: unless-stopped
     environment:
-      ADMINER_DEFAULT_SERVER: dbmysql8-todoappdb
+      ADMINER_DEFAULT_SERVER: todoapp-mysql84-db
     networks:
       - internal
       - proxy
     labels:
-      - "traefik.backend=todo-mysql"
-      - "traefik.frontend.rule=Host:todo-mysql.united-portal.com"
-      - "traefik.docker.network=proxy"
-      - "traefik.port=8080"
       - "traefik.enable=true"
+      - "traefik.http.routers.todo-adminer-mysql.rule=Host(`todo-adminer-mysql.example.com`)" # change hostname!
+      - "traefik.http.routers.todo-adminer-mysql.tls=true"
+      - "traefik.http.routers.todo-adminer-mysql.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.todo-adminer-mysql.entrypoints=websecure"
+      - "traefik.http.services.todo-adminer-mysql.loadbalancer.server.port=8080"
     depends_on:
       todo-dbmysql84:
         condition: service_healthy
@@ -59,8 +56,8 @@ services:
   todo-dbmysql84:
     image: mysql:8.4.4
     command: mysqld --mysql-native-password=ON
-    container_name: dbmysql8-todoappdb
-    restart: always
+    container_name: todoapp-mysql84-db
+    restart: unless-stopped
     cap_add:
       - SYS_NICE
     environment:
@@ -79,7 +76,7 @@ services:
       - '3306'
       # Where our data will be persisted
     volumes:
-      - dbmysql84-todoappdb:/var/lib/mysql
+      - todoapp-mysql84-vol:/var/lib/mysql
     networks:
       - internal
     healthcheck:
@@ -88,4 +85,4 @@ services:
       retries: 20
 # Names our volume
 volumes:
-  dbmysql84-todoappdb:
+  todoapp-mysql84-vol:

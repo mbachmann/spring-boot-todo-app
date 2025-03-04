@@ -4,8 +4,8 @@ services:
 
   todo-app-h2:
     image: uportal/todo-app:latest
-
-    restart: always
+    container_name: todoapp-on-h2
+    restart: unless-stopped
     environment:
       APP_NAME: Todo App with H2
       ACTIVE_PROFILES: dev,h2

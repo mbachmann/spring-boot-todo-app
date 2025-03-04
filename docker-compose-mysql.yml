@@ -4,13 +4,13 @@ version: '3'
 services:
   todo-app-mysql:
     image: uportal/todo-app:latest
-
-    restart: always
+    container_name: todoapp-on-mysql-84
+    restart: unless-stopped
     environment:
       APP_NAME: Todo App with MySQL
       ACTIVE_PROFILES: dev,mysql
       APP_URL: http://localhost:8080
-      APP_DB_HOST: dbmysql84
+      APP_DB_HOST: todoapp-mysql84-db
       APP_DB_PORT: 3306
       APP_DB_NAME: db
       APP_DB_USERNAME: root
@@ -23,21 +23,21 @@ services:
 
   todo-adminer:
     image: adminer:4.17.1
-    container_name: adminer-todoapp
-    restart: always
+    container_name: todoapp-adminer-on-mysql
+    restart: unless-stopped
     ports:
       - 9090:8080
     environment:
-      ADMINER_DEFAULT_SERVER: dbmysql84
+      ADMINER_DEFAULT_SERVER: todoapp-mysql84-db
     depends_on:
       todo-dbmysql84:
         condition: service_healthy
 
   todo-dbmysql84:
     image: mysql:8.4.4
-    container_name: dbmysql84
+    container_name: todoapp-mysql84-db
     command: mysqld --mysql-native-password=ON
-    restart: always
+    restart: unless-stopped
     environment:
       MYSQL_DATABASE: 'db'
       # So you don't have to use root, but you can if you like

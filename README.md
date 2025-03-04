@@ -1670,70 +1670,37 @@ volumes:
 ### Create a docker-compose-h2-traefik.yml file
 
 The _docker-compose-h2.yml_ contains one service with the name _todo-app-h2_. The environment variables are used for defining the application name and with active spring profiles.
-The service registers at the _traefik reverse proxy_ and is available under the url: _todo-app-h2.united-portal.com_.
+The service registers at the _traefik reverse proxy_ and is available under the url: _todo-app-h2.example.com_.
 
 Replace **uportal** with your **dockerhub id**.
 
 <br/>
 
 ```yaml
-version: '2'
-
 
 networks:
   proxy:
     external: true
 
 services:
-
   todo-app-h2:
     image: uportal/todo-app:latest
+    container_name: todoapp-on-h2
     labels:
-      - "traefik.backend=todo-h2"
-      - "traefik.frontend.rule=Host:todo-h2.united-portal.com"
-      - "traefik.docker.network=proxy"
-      - "traefik.port=8080"
       - "traefik.enable=true"
-
-    restart: always
+      - "traefik.http.routers.todo-h2.rule=Host(`todo-h2.example.com`)" # change hostname!
+      - "traefik.http.routers.todo-h2.tls=true"
+      - "traefik.http.routers.todo-h2.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.todo-h2.entrypoints=websecure"
+      - "traefik.http.services.todo-h2.loadbalancer.server.port=8080"
+    restart: unless-stopped
     networks:
       - proxy
     environment:
       APP_NAME: Todo Rest with Spring Boot and H2
       ACTIVE_PROFILES: dev,h2
-      APP_URL: https://todo-h2.united-portal.com
+      APP_URL: https://todo-h2.example.com # change hostname!
 
-```
-
-<br/>
-### Create a docker-compose-h2-traefik-v2.yml file
-
-For the reverse proxy traefik version 2 a new set of labels is neccessary: 
-
-```yaml
-version: '2'
-
-
-networks:
-  proxy:
-    external: true
-
-services:
-
-  todo-app-h2:
-    image: uportal/todo-app:latest
-    labels:
-      - traefik.http.routers.blog.rule=Host(`todo-h2.united-portal.com`)
-      - traefik.http.routers.blog.tls=true
-      - traefik.http.routers.blog.tls.certresolver=lets-encrypt
-      - traefik.port=8080
-    restart: always
-    networks:
-      - proxy
-    environment:
-      APP_NAME: Todo Rest with Spring Boot and H2
-      ACTIVE_PROFILES: dev,h2
-      APP_URL: https://todo-h2.united-portal.com
 
 ```
 
