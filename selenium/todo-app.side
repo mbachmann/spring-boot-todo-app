@@ -1,0 +1,454 @@
+{
+  "id": "ddad9ba4-f897-46ce-9fee-f4a2214be76b",
+  "version": "2.0",
+  "name": "todo-app",
+  "url": "https://todo-h2.united-portal.com",
+  "tests": [{
+    "id": "275dd99f-105d-4f17-bd57-d19e7a6e18cb",
+    "name": "smoke test",
+    "commands": [{
+      "id": "1ee21cd2-e41b-4812-98e4-8b75e33cd532",
+      "comment": "",
+      "command": "open",
+      "target": "/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "ed216a3f-7fb8-49be-a51a-7e57c57ffc8e",
+      "comment": "",
+      "command": "setWindowSize",
+      "target": "553x692",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "bd2900eb-7a87-43fa-bbeb-8c81e669d3e8",
+      "comment": "",
+      "command": "click",
+      "target": "id=listNameTextField",
+      "targets": [
+        ["id=listNameTextField", "id"],
+        ["css=#listNameTextField", "css:finder"],
+        ["xpath=//input[@id='listNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "ab8302ba-49a3-4fb4-8c45-6c38dbbd2536",
+      "comment": "",
+      "command": "type",
+      "target": "id=listNameTextField",
+      "targets": [
+        ["id=listNameTextField", "id"],
+        ["css=#listNameTextField", "css:finder"],
+        ["xpath=//input[@id='listNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "Test List"
+    }, {
+      "id": "bb32e957-686c-4cdc-91e4-994d55440116",
+      "comment": "",
+      "command": "sendKeys",
+      "target": "id=listNameTextField",
+      "targets": [
+        ["id=listNameTextField", "id"],
+        ["css=#listNameTextField", "css:finder"],
+        ["xpath=//input[@id='listNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "${KEY_ENTER}"
+    }, {
+      "id": "4cb2b61b-036c-4d0a-a91a-0d3d1c1a6d73",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//li[5]/div/span/a/i",
+      "targets": [
+        ["xpath=//a[@id='41b4a48c-0453-4324-9a53-8b9602ea1903']/i", "xpath:idRelative"],
+        ["xpath=//li[5]/div/span/a/i", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "543709c1-6723-414e-ab18-e9c94f9e9bc7",
+      "comment": "",
+      "command": "click",
+      "target": "id=listNameTextField",
+      "targets": [
+        ["id=listNameTextField", "id"],
+        ["css=#listNameTextField", "css:finder"],
+        ["xpath=//input[@id='listNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "3567f2b0-ba57-4f18-b80d-6220f49d62eb",
+      "comment": "",
+      "command": "type",
+      "target": "id=listNameTextField",
+      "targets": [
+        ["id=listNameTextField", "id"],
+        ["css=#listNameTextField", "css:finder"],
+        ["xpath=//input[@id='listNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "Test List renamed"
+    }, {
+      "id": "eabfefbc-169a-4f3b-9437-b8681ff4c126",
+      "comment": "",
+      "command": "sendKeys",
+      "target": "id=listNameTextField",
+      "targets": [
+        ["id=listNameTextField", "id"],
+        ["css=#listNameTextField", "css:finder"],
+        ["xpath=//input[@id='listNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "${KEY_ENTER}"
+    }, {
+      "id": "3ae19df5-8d0f-479f-82ce-891eeb019c02",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//li[5]/div/span/a[2]/i",
+      "targets": [
+        ["xpath=(//a[@id='41b4a48c-0453-4324-9a53-8b9602ea1903']/i)[2]", "xpath:idRelative"],
+        ["xpath=//li[5]/div/span/a[2]/i", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "f6584762-3057-4a64-a229-5630d5ef27a8",
+      "comment": "",
+      "command": "click",
+      "target": "id=listNameTextField",
+      "targets": [
+        ["id=listNameTextField", "id"],
+        ["css=#listNameTextField", "css:finder"],
+        ["xpath=//input[@id='listNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "9c3c8bf6-48ad-4357-ba45-702ba9d566e1",
+      "comment": "",
+      "command": "type",
+      "target": "id=listNameTextField",
+      "targets": [
+        ["id=listNameTextField", "id"],
+        ["css=#listNameTextField", "css:finder"],
+        ["xpath=//input[@id='listNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "A new list"
+    }, {
+      "id": "75147700-8af9-4bb1-97f3-e72f050cbc40",
+      "comment": "",
+      "command": "sendKeys",
+      "target": "id=listNameTextField",
+      "targets": [
+        ["id=listNameTextField", "id"],
+        ["css=#listNameTextField", "css:finder"],
+        ["xpath=//input[@id='listNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "${KEY_ENTER}"
+    }, {
+      "id": "a580314d-00ae-4318-bc27-f10b0d40a039",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=A new list",
+      "targets": [
+        ["linkText=A new list", "linkText"],
+        ["css=#item1e2c4258-da4c-49ad-b778-6a7ad07275d8 .todo-list-name-item", "css:finder"],
+        ["xpath=//a[contains(text(),'A new list')]", "xpath:link"],
+        ["xpath=//li[@id='item1e2c4258-da4c-49ad-b778-6a7ad07275d8']/div/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/todo-items?listId=1e2c4258-da4c-49ad-b778-6a7ad07275d8')]", "xpath:href"],
+        ["xpath=//li[5]/div/a", "xpath:position"],
+        ["xpath=//a[contains(.,'A new list')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "746911ff-335e-46c3-a819-c23d7ad4a37f",
+      "comment": "",
+      "command": "click",
+      "target": "id=taskNameTextField",
+      "targets": [
+        ["id=taskNameTextField", "id"],
+        ["css=#taskNameTextField", "css:finder"],
+        ["xpath=//input[@id='taskNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "092c6016-c8c6-44cb-93e4-3dd2162c1bb4",
+      "comment": "",
+      "command": "type",
+      "target": "id=taskNameTextField",
+      "targets": [
+        ["id=taskNameTextField", "id"],
+        ["css=#taskNameTextField", "css:finder"],
+        ["xpath=//input[@id='taskNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "add first element"
+    }, {
+      "id": "0dd2d79e-6803-4284-9975-463c90397066",
+      "comment": "",
+      "command": "sendKeys",
+      "target": "id=taskNameTextField",
+      "targets": [
+        ["id=taskNameTextField", "id"],
+        ["css=#taskNameTextField", "css:finder"],
+        ["xpath=//input[@id='taskNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "${KEY_ENTER}"
+    }, {
+      "id": "8747e0e2-66d3-4083-a683-a0b80af0a66f",
+      "comment": "",
+      "command": "type",
+      "target": "id=taskNameTextField",
+      "targets": [
+        ["id=taskNameTextField", "id"],
+        ["css=#taskNameTextField", "css:finder"],
+        ["xpath=//input[@id='taskNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "add second element"
+    }, {
+      "id": "62b9d1c6-76ac-44b9-96e1-e0294b9bfbba",
+      "comment": "",
+      "command": "sendKeys",
+      "target": "id=taskNameTextField",
+      "targets": [
+        ["id=taskNameTextField", "id"],
+        ["css=#taskNameTextField", "css:finder"],
+        ["xpath=//input[@id='taskNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "${KEY_ENTER}"
+    }, {
+      "id": "7a102530-1759-4d5f-8e18-b72753f3b32b",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//i",
+      "targets": [
+        ["css=#\\31 0 > .toggle-completed-checkbox", "css:finder"],
+        ["xpath=//a[@id='10']/i", "xpath:idRelative"],
+        ["xpath=//i", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "3a943ca7-4d3c-455d-a389-3b55f70f78ae",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//i",
+      "targets": [
+        ["css=#\\31 0 > .toggle-completed-checkbox", "css:finder"],
+        ["xpath=//a[@id='10']/i", "xpath:idRelative"],
+        ["xpath=//i", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "1fdbdea3-1f53-4107-be0d-a1412a8c400d",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//span[2]/a/i",
+      "targets": [
+        ["xpath=(//a[@id='10']/i)[2]", "xpath:idRelative"],
+        ["xpath=//span[2]/a/i", "xpath:position"],
+        ["xpath=//i[contains(.,'edit')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "ac4a97a6-6fd9-4e67-8603-0e8b5560e4bf",
+      "comment": "",
+      "command": "click",
+      "target": "id=taskNameTextField",
+      "targets": [
+        ["id=taskNameTextField", "id"],
+        ["css=#taskNameTextField", "css:finder"],
+        ["xpath=//input[@id='taskNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "55d372bd-361f-4c52-b0f2-f544661e22e3",
+      "comment": "",
+      "command": "type",
+      "target": "id=taskNameTextField",
+      "targets": [
+        ["id=taskNameTextField", "id"],
+        ["css=#taskNameTextField", "css:finder"],
+        ["xpath=//input[@id='taskNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "add first element changed"
+    }, {
+      "id": "c11ae80f-6454-4064-a086-0b09a7bca73b",
+      "comment": "",
+      "command": "sendKeys",
+      "target": "id=taskNameTextField",
+      "targets": [
+        ["id=taskNameTextField", "id"],
+        ["css=#taskNameTextField", "css:finder"],
+        ["xpath=//input[@id='taskNameTextField']", "xpath:attributes"],
+        ["xpath=//input", "xpath:position"]
+      ],
+      "value": "${KEY_ENTER}"
+    }, {
+      "id": "2b2a6c8e-5efe-413b-bcba-10c7930ff317",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//a[2]/i",
+      "targets": [
+        ["xpath=(//a[@id='10']/i)[3]", "xpath:idRelative"],
+        ["xpath=//a[2]/i", "xpath:position"],
+        ["xpath=//i[contains(.,'delete')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "12b374c6-ba39-4f6a-ac49-c66a8ebac7e1",
+      "comment": "",
+      "command": "click",
+      "target": "css=button",
+      "targets": [
+        ["css=button", "css:finder"],
+        ["xpath=//button[@onclick=\"window.location.href='/'\"]", "xpath:attributes"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'Back to Main Page')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "2307e646-3e16-4238-87b1-24751bb7daa0",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "css=button",
+      "targets": [
+        ["css=button", "css:finder"],
+        ["xpath=//button[@onclick=\"window.location.href='/version'\"]", "xpath:attributes"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'About')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "347a8413-1007-4399-8aba-e101bc941bad",
+      "comment": "",
+      "command": "click",
+      "target": "css=button",
+      "targets": [
+        ["css=button", "css:finder"],
+        ["xpath=//button[@onclick=\"window.location.href='/version'\"]", "xpath:attributes"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'About')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "6c8a78b5-35e8-4cf2-98d0-e79ed475b9a4",
+      "comment": "",
+      "command": "click",
+      "target": "css=button",
+      "targets": [
+        ["css=button", "css:finder"],
+        ["xpath=//button[@onclick=\"window.location.href='/index'\"]", "xpath:attributes"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'Home')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "2f233892-7f4e-4516-a82c-37b87d315679",
+      "comment": "",
+      "command": "mouseOver",
+      "target": "css=button",
+      "targets": [
+        ["css=button", "css:finder"],
+        ["xpath=//button[@onclick=\"window.location.href='/version'\"]", "xpath:attributes"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'About')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "77c568c8-eba9-4fec-bf24-9a1ee41604b1",
+      "comment": "",
+      "command": "mouseOut",
+      "target": "css=button",
+      "targets": [
+        ["css=button", "css:finder"],
+        ["xpath=//button[@onclick=\"window.location.href='/version'\"]", "xpath:attributes"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'About')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "8856d4b3-1553-4e90-bfc3-da04dc349325",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=To-Do List for business",
+      "targets": [
+        ["linkText=To-Do List for business", "linkText"],
+        ["css=#item87bd261d-f044-4f08-ba09-24ecf6d9ab33 .todo-list-name-item", "css:finder"],
+        ["xpath=//a[contains(text(),'To-Do List for business')]", "xpath:link"],
+        ["xpath=//li[@id='item87bd261d-f044-4f08-ba09-24ecf6d9ab33']/div/a", "xpath:idRelative"],
+        ["xpath=//a[contains(@href, '/todo-items?listId=87bd261d-f044-4f08-ba09-24ecf6d9ab33')]", "xpath:href"],
+        ["xpath=//a", "xpath:position"],
+        ["xpath=//a[contains(.,'To-Do List for business')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "b1ee1fb9-0a49-4b22-9901-e9f3e8649585",
+      "comment": "",
+      "command": "click",
+      "target": "css=button",
+      "targets": [
+        ["css=button", "css:finder"],
+        ["xpath=//button[@onclick=\"window.location.href='/'\"]", "xpath:attributes"],
+        ["xpath=//button", "xpath:position"],
+        ["xpath=//button[contains(.,'Back to Main Page')]", "xpath:innerText"]
+      ],
+      "value": ""
+    }, {
+      "id": "b91c102a-4b00-4006-90f5-26aa671b8eb8",
+      "comment": "",
+      "command": "click",
+      "target": "css=html",
+      "targets": [
+        ["css=html", "css:finder"],
+        ["xpath=//html", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "8e6678b9-61b0-45cd-b566-6ba908faa8b2",
+      "comment": "",
+      "command": "click",
+      "target": "css=html",
+      "targets": [
+        ["css=html", "css:finder"],
+        ["xpath=//html", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "14a96d98-08eb-4df6-b110-86bc6fcb394a",
+      "comment": "",
+      "command": "click",
+      "target": "xpath=//li[5]/div/span/a[2]/i",
+      "targets": [
+        ["xpath=(//a[@id='50e9c1ff-17f4-4b9e-8d70-ef2e77d8614c']/i)[2]", "xpath:idRelative"],
+        ["xpath=//li[5]/div/span/a[2]/i", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "d2be0ab5-0d37-45e9-bbae-da70ce5dbe2a",
+      "comment": "",
+      "command": "close",
+      "target": "",
+      "targets": [],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "6eea847c-6b10-4f73-9f71-9528ff909a17",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["275dd99f-105d-4f17-bd57-d19e7a6e18cb"]
+  }],
+  "urls": ["https://todo-h2.united-portal.com/"],
+  "plugins": []
+}
