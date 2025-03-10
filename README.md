@@ -126,8 +126,8 @@ Maintained by [mbachmann](https://github.com/mbachmann).
 
 
 
-
-Content
+<br/>
+## Content
 
 - [Setup the project](#setup-spring-initializr)
 - [Build the backend](#create-the-data-model)
@@ -164,6 +164,7 @@ The technology stack consists of the following components:
 - OpenApi
 - Docker and Docker Compose
 
+<br/>
 
 ## Setup Spring Initializr
 
@@ -323,6 +324,7 @@ public interface HasLogger {
 }
 
 ```
+<br/>
 
 ## Create the Data Model
 
@@ -426,6 +428,7 @@ Annotations:
 - **@NotEmpty**, The annotated element must not be null nor empty. Supported types are: CharSequence, Collection, Map and Array
 - **@Email** The string has to be a well-formed email address.
 
+<br/>
 
 The _TodoItemList.java_ interface is a projection that can be used to extract an aggregated database information.
 
@@ -446,6 +449,7 @@ public interface TodoItemList    {
 
 It counts the number of items in a list and provides the listId and the creation from and to date range.
 
+<br/>
 
 The _TodoListName.java_ class is an entity class that is mapped to the database table.
 
@@ -558,6 +562,8 @@ The _TodoItemRepository_ interface extends the _JpaRepository_ interface. The _J
 CRUD operations. The _TodoItemRepository_ interface has additional methods for finding items by listId, taskName and
 deleting items by listId.
 
+<br/>
+
 Adding _TodoListNameRepository.java_:
 
 ```java
@@ -579,10 +585,13 @@ public interface TodoListNameRepository extends JpaRepository<TodoListName, UUID
 
 ```
 
+<br/>
 
 ## Create the DTO's
 
 The Data Transfer Objects provide some additional serialization opportunities for the todo item data.
+
+<br/>
 
 ### TodoItemListsDTO
 
@@ -647,6 +656,7 @@ The _TodoItemListsDTO_ class has the following attributes:
 - **getTodoItemList()**, returns the list of UUID's.
 - **setTodoItemList()**, sets the list of UUID's.
 
+<br/>
 
 ### TodoItemsDTO
 
@@ -847,6 +857,7 @@ The _TodoItemsDTO_ class has the following attributes:
 - **listName**, the name of the list.
 - **todoItemList**, a list of todo items.
 
+<br/>
 
 ### TodoListNameDTO
 
@@ -950,6 +961,7 @@ The _TodoListNameDTO_ class has the following attributes:
 - **toDate**, the creation date of the last item in the list.
 - **listName**, the name of the list.
 
+<br/>
 
 ## Create the Services
 
@@ -1142,6 +1154,7 @@ The _TodoItemService_ class has the following methods:
 - **getItem()**, gets a todo item.
 - **deleteByListId()**, deletes a list by list id.
 
+<br/>
 
 ## Create the DbPopulator
 
@@ -1271,7 +1284,7 @@ The _DbPopulator_ class has the following methods:
 - **saveTodoItems()**, saves todo items.
 - **createTodoListForEmpty()**, creates an empty todo list.
 
-
+<br/>
 
 
 ## Create the REST Controllers
@@ -1503,6 +1516,7 @@ public class ResourceNotFoundException extends RuntimeException {
 
 ```
 
+<br/>
 
 ## The TodoApplication
 
@@ -1604,6 +1618,7 @@ The _TodoApplication_ class has the following methods:
 Instead of using the _@CrossOrigin_ annotation at REST controller class level, we are using the _CorsFilter_ to allow all origins.
 The _CorsFilter_ is configured to allow all origins, headers and methods.
 
+<br/>
 
 ## Create the Profiles
 
@@ -1632,6 +1647,8 @@ auto-populate-db=true
 
 ```
 
+<br/>
+
 ### Create an application-dev.properties
 
 The _application-dev.properties_ consists of the properties for the configuration of the _Spring OpenApi_.
@@ -1655,6 +1672,8 @@ springdoc.api-docs.resolve-extensions-properties=true
 
 ```
 
+<br/>
+
 ### Create an application-h2.properties
 
 The _application-h2.properties_ are configuring the H2 database including the _h2-console_.
@@ -1677,6 +1696,9 @@ spring.h2.console.settings.web-allow-others=true
 
 
 ```
+
+<br/>
+
 ### Create an application-mysql.properties
 
 The _application-mysql.properties_ are configuring the MySql database. The url
@@ -1698,6 +1720,8 @@ spring.datasource.username= ${APP_DB_USERNAME:root}
 spring.datasource.password=${APP_DB_PASSWORD:password}
 
 ```
+
+<br/>
 
 ## Implement the Frontend Client with Thymeleaf
 
@@ -2051,6 +2075,8 @@ li.completed i {
 
 ```
 
+<br/>
+
 Then, adding JavaScript file in resource/static/js/utils.js.
 
 ```javascript
@@ -2070,6 +2096,8 @@ function cuteHide(el) {
 Explanation of the Code:
 
 - **cuteHide()**, for animation during delete.
+
+<br/>
 
 Then, adding JavaScript file in resource/static/js/index.js.
 
@@ -2284,6 +2312,8 @@ Explanation of the Code:
 - **deleteTodoList()**, deletes a todoList in the backend and deletes it from the list.
 - **editTodoListName()**, takes the List Name ("todo-list-name-item") from the list and copies it the the listNameTextField.
 - **getAndCreateTodoListRow()**, gets the todoList from the backend and updates the list.
+
+<br/>
 
 Then, adding JavaScript file in resource/static/js/todo-items.js.
 
@@ -2576,6 +2606,8 @@ Explanation of the Code:
 - **loadItems()**, loads the todoItems from the backend and creates the list.
 - **loadListName()**, loads the list name from the backend.
 
+<br/>
+
 Finally, we implement HTML file called _index-template.html_ in _resources/templates/index-template.html_.
 
 
@@ -2613,6 +2645,8 @@ Finally, we implement HTML file called _index-template.html_ in _resources/templ
 </html>
 ```
 
+<br/>
+
 Then the template file _todo-items-template.html_ in _resources/templates/todo-items-template.html_.
 
 ```html
@@ -2642,6 +2676,8 @@ Then the template file _todo-items-template.html_ in _resources/templates/todo-i
 </div>
 ```
 
+<br/>
+
 And finally the _version-template.html_ in _resources/templates/version-template.html_.
 
 ```html
@@ -2667,6 +2703,7 @@ And finally the _version-template.html_ in _resources/templates/version-template
 </html>
 ```
 
+<br/>
 
 ## Starting the Application
 
@@ -2679,6 +2716,8 @@ Todo Application - Enter in Browser:
 - [http://localhost:8080/v3/api-docs.yaml](http://localhost:8080/v3/api-docs.yaml) -> _yaml_ file is downloaded -> [https://editor.swagger.io/](https://editor.swagger.io/)
 - [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html) The _OpenApi_ Frontend
 - [http://localhost:8080/h2-console](http://localhost:8080/h2-console)  -> mit Generic _H2_ (Embedded), _org.h2.Driver_, **jdbc:h2:mem:testdb** und sa
+
+<br/>
 
 ### OpenApi Frontend for API Testing
 
