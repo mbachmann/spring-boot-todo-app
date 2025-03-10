@@ -32,19 +32,20 @@ public class TodoApplication {
     public void afterInit() {
         boolean hasDevProfile = Arrays.asList(env.getActiveProfiles()).contains("dev");
         boolean hasH2Database = Arrays.asList(env.getActiveProfiles()).contains("h2");
+        String appUrl = env.getProperty("todoapp.server");
         String applicationName = env.getProperty("spring.application.name");
         String openApiInfo="";
         String h2ConsoleInfo="";
         if (hasDevProfile) {
-            openApiInfo = "http://localhost:8080/v3/api-docs\n" +
-                    "http://localhost:8080/v3/api-docs.yaml -> yaml file is downloaded -> https://editor.swagger.io/\n" +
-                    "http://localhost:8080/swagger-ui.html \n";
+            openApiInfo = appUrl + "/v3/api-docs\n" +
+                    appUrl + "/v3/api-docs.yaml -> yaml file is downloaded -> https://editor.swagger.io/\n" +
+                    appUrl + "/swagger-ui.html \n";
         }
         if (hasH2Database) {
-            h2ConsoleInfo= "http://localhost:8080/h2-console  " + "" +
+            h2ConsoleInfo= appUrl + "/h2-console  " + "" +
                     "-> mit Generic H2 (Embedded), org.h2.Driver, jdbc:h2:mem:testdb und sa \n";
         }
-        System.out.println("\n\nApplication [" + applicationName + "] - Enter in Browser:\nhttp://localhost:8080 \n" +
+        System.out.println("\n\nApplication [" + applicationName + "] - Enter in Browser:\n" + appUrl + " \n" +
                 openApiInfo +
                 h2ConsoleInfo + "\n" +
                 "Active Profiles: " + Arrays.toString(env.getActiveProfiles()) + "\n\n");
@@ -77,7 +78,5 @@ public class TodoApplication {
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
-
-
 
 }
