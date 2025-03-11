@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
@@ -34,13 +35,13 @@ public class TodoItemRepositoryContainerTest extends BaseTestContainer {
     @Test
     public void getAllTodoListDetails() throws Exception {
         List<TodoItem> todoItems = todoItemRepository.findAll();
-        assertTrue(todoItems.size() > 0);
+        assertFalse(todoItems.isEmpty());
     }
 
     @Test
     public void getAllTodoListsDetails() throws Exception {
         List<UUID> listIds = todoItemRepository.findDistinctListId();
-        assertTrue(listIds.size() > 0);
+        assertFalse(listIds.isEmpty());
     }
 
 
