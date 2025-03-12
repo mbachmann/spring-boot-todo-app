@@ -6,7 +6,7 @@ import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 
 public class VersionPage {
-    private WebDriver driver;
+    private final WebDriver driver;
 
     @FindBy(xpath = "//h1[@class='page-title']")
     private WebElement pageTitle;
@@ -81,5 +81,9 @@ public class VersionPage {
 
     public void goToHomePage() {
         homeButton.click();
+    }
+
+    public void navigateToAbout(String baseUrl) {
+        driver.get( baseUrl + "/version");
     }
 }

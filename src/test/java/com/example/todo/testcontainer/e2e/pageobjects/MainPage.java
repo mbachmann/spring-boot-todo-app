@@ -10,7 +10,7 @@ public class MainPage {
 
     private final WebDriver driver;
     public final By listNameField = By.id("listNameTextField");
-    public final By todoListItems = By.cssSelector(".todo-list-name-item");
+    public final By todoListNameItems = By.cssSelector(".todo-list-name-item");
     private final By deleteButtons = By.cssSelector(".todo-actions a[onclick^='deleteTodoList']");
     private final By pageTitle = By.cssSelector(".page-title");
     private final By editButtons = By.cssSelector(".todo-actions a[onclick^='editTodoListName']");
@@ -39,7 +39,8 @@ public class MainPage {
     public void executeKeyBoardEventEnter(String script) {
         WebElement inputField = driver.findElement(listNameField);
         ((JavascriptExecutor) driver).executeScript(
-                "var event = new KeyboardEvent('keypress', { keyCode: 13, which: 13, bubbles: true }); arguments[0].dispatchEvent(event);",
+                "var event = new KeyboardEvent('keypress', { keyCode: 13, which: 13, bubbles: true }); " +
+                       "arguments[0].dispatchEvent(event);",
                 inputField
         );
     }
@@ -49,7 +50,7 @@ public class MainPage {
     }
 
     public List<WebElement> getTodoLists() {
-        return driver.findElements(todoListItems);
+        return driver.findElements(todoListNameItems);
     }
 
     public WebElement getTodoListNameItemATag(String name) {
@@ -89,13 +90,7 @@ public class MainPage {
         driver.findElement(aboutButton).click();
     }
 
-    public void navigateToHome() {
-        driver.get("http://localhost:8080/");
+    public void navigateToHome(String baseUrl) {
+        driver.get(baseUrl);
     }
-
-    public void navigateToAbout() {
-        driver.get("http://localhost:8080/version");
-    }
-
-
 }

@@ -9,7 +9,6 @@ import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -22,7 +21,6 @@ import java.io.File;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
@@ -59,7 +57,7 @@ public class BaseTestContainer extends AbstractTest implements HasLogger {
     static void beforeAll() {
         // driver = new ChromeDriver(new ChromeOptions().addArguments("--headless"));
         driver = new ChromeDriver();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
     }
 
     @AfterAll
@@ -67,9 +65,9 @@ public class BaseTestContainer extends AbstractTest implements HasLogger {
         driver.quit();
     }
 
-    protected void sleep(int seconds) {
+    protected void sleep(int milliSeconds) {
         try {
-            TimeUnit.SECONDS.sleep(seconds);
+            TimeUnit.MILLISECONDS.sleep(milliSeconds);
         } catch (InterruptedException e) {
             getLogger().info(Arrays.toString(e.getStackTrace()));
         }

@@ -1,12 +1,7 @@
 package com.example.todo.testcontainer.e2e.tests;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-
 import com.example.todo.testcontainer.BaseTestContainer;
 import com.example.todo.testcontainer.e2e.pageobjects.MainPage;
-
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -18,7 +13,9 @@ import org.openqa.selenium.support.ui.Wait;
 import java.time.Duration;
 import java.util.List;
 
-@DisplayName("Application")
+import static org.assertj.core.api.Assertions.assertThat;
+
+@DisplayName("Main Page e2e Test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MainPageE2eTest extends BaseTestContainer {
 
@@ -47,7 +44,7 @@ class MainPageE2eTest extends BaseTestContainer {
     @Order(1)
     @DisplayName("I see 'To-Do Lists' as a title")
     void checkTheCorrectTitle () {
-        mainPage.navigateToHome();
+        mainPage.navigateToHome(baseUrl);
         assertThat(driver.getTitle()).isEqualTo("To-Do Lists");
         assertThat(mainPage.getPageTitle()).isEqualTo("To-Do Lists");
         assertThat(mainPage.h1.getText()).isEqualTo("To-Do Lists");
@@ -59,7 +56,7 @@ class MainPageE2eTest extends BaseTestContainer {
     @Order(2)
     @DisplayName("I see 4 'To-Do Lists' and their names")
     void mainPageTodoLists() {
-        mainPage.navigateToHome();
+        mainPage.navigateToHome(baseUrl);
         assertThat(mainPage.getTodoLists().size()).isEqualTo(4);
         assertThat(mainPage.getTodoListNameItemATag("To-Do List for business").getText()).isEqualTo("To-Do List for business");
         assertThat(mainPage.getTodoListNameItemATag("To-Do List for homework").getText()).isEqualTo("To-Do List for homework");
@@ -71,9 +68,9 @@ class MainPageE2eTest extends BaseTestContainer {
     @Order(3)
     @DisplayName("I can add a 'New To-Do List'")
     void mainPageAddANewList() {
-        mainPage.navigateToHome();
+        mainPage.navigateToHome(baseUrl);
         mainPage.enterListNameField(newList);
-        wait.until(ExpectedConditions.numberOfElementsToBe(mainPage.todoListItems, 5));
+        wait.until(ExpectedConditions.numberOfElementsToBe(mainPage.todoListNameItems, 5));
         assertThat(mainPage.getTodoLists().size()).isEqualTo(5);
 
         List<WebElement> lists = mainPage.getTodoLists();
@@ -108,7 +105,7 @@ class MainPageE2eTest extends BaseTestContainer {
     @DisplayName("I can navigate to the 'Renamed To-Do List'")
     void mainPageNavigateToRenamedList()  {
         String titleTodoItems = "To-Do List";
-        mainPage.navigateToHome();
+        mainPage.navigateToHome(baseUrl);
         mainPage.getTodoListNameItemATag(renamedList).click();
         wait.until(ExpectedConditions.titleIs(titleTodoItems));
         assertThat(driver.getTitle()).isEqualTo(titleTodoItems);
@@ -120,7 +117,7 @@ class MainPageE2eTest extends BaseTestContainer {
     @DisplayName("I can delete the 'Renamed To-Do List'")
     void mainPageDeleteRenamedList() {
         mainPage.deleteTodoList(renamedList);
-        wait.until(ExpectedConditions.numberOfElementsToBe(mainPage.todoListItems, 4));
+        wait.until(ExpectedConditions.numberOfElementsToBe(mainPage.todoListNameItems, 4));
         assertThat(mainPage.getTodoLists().size()).isEqualTo(4);
         takeScreenshot(getClass().getSimpleName(), "mainPageDeleteRenamedList");
     }

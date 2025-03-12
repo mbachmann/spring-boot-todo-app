@@ -3020,3 +3020,62 @@ There are examples of Traefik for _mysql_ and _postgres_ including _adminer_:
 
 For the postgres version is a folder postgres with a schema.sql file for creating the database schema.
 This script runs only after the db has been created the first time.
+
+
+## Selenium Tests with Test Container
+
+The Selenium tests are located in the _src/test/java/com/examplr/todo/testcontainer/e2e_ folder. 
+The tests are written in Java and use the Selenium WebDriver.
+
+The _TestContainers_ library is used to start a container with the todo-app and a container with the database.
+
+The requirements for running the e2e tests are:
+
+- Docker is installed
+- Chrome is installed (if not headless)
+- ChromeDriver is automatically installed in the Test Container
+
+The TestContainer is started by the _BaseTestContainer_ class. It containers a MySQL database.
+The properties are set in the _application-mysql-test.properties_ file in the test resources folder _src/test/resources_.
+
+This property file is set in the BaseTestContainer with:
+
+```java
+    @ActiveProfiles("mysql-test")
+```
+
+The BaseTestContainer class is making sure the TodoApp and Database are started before the tests are run.
+
+- The todo-app is running on port 8080
+- The database is running on port 3306
+- The database has a schema with the name _db_
+- The database has a user _user_ with the password _todoapp_
+
+
+The tests are started with the command:
+
+```shell
+./mvnw clean test
+```
+
+This command starts the normal unit tests and the todo-app and the database in the Test Container, 
+runs the tests and stops the containers.
+
+The BaseClass of the Selenium tests is the _BaseTestContainer_ class.
+
+
+For visual checks during the development of the tests, 
+you can instantiate the ChromeDriver without the _headless_ option.
+
+```java
+    driver = new ChromeDriver();
+    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+```
+
+The _headless_ option is set to _true_ for the CI/CD pipeline.
+
+```java
+    driver = new ChromeDriver(new ChromeOptions().addArguments("--headless"));
+    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
+```
+
