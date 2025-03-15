@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("Main Page e2e Test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-class MainPageE2eTest extends BaseTestContainer {
+class MainPageE2ETest extends BaseTestContainer {
 
     private final String newList = "New To-Do List";
     String renamedList = "Renamed To-Do List";

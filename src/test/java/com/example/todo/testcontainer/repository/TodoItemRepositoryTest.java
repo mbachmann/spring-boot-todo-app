@@ -2,7 +2,7 @@ package com.example.todo.testcontainer.repository;
 
 import com.example.todo.model.TodoItem;
 import com.example.todo.repository.TodoItemRepository;
-import com.example.todo.testcontainer.BaseTestContainer;
+import com.example.todo.testcontainer.DBBaseTestContainer;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @SpringBootTest
-public class TodoItemRepositoryContainerTest extends BaseTestContainer {
+public class TodoItemRepositoryTest extends DBBaseTestContainer {
 
     @Autowired
     TodoItemRepository todoItemRepository;

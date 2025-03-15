@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @DisplayName("Main Page e2e Test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class VersionPageE2eTest extends BaseTestContainer {
+public class VersionPageE2ETest extends BaseTestContainer {
     private VersionPage versionPage;
     private Wait<WebDriver> wait;
 

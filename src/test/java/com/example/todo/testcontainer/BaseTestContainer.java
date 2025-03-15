@@ -1,8 +1,7 @@
 package com.example.todo.testcontainer;
 
-import com.example.todo.AbstractTest;
 import com.example.todo.TodoApplication;
-import com.example.todo.utils.HasLogger;
+import jakarta.annotation.PostConstruct;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.openqa.selenium.OutputType;
@@ -10,11 +9,7 @@ import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
+import org.springframework.boot.test.web.server.LocalServerPort;
 import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -24,34 +19,15 @@ import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-@ActiveProfiles("mysql-test")
-@SpringBootTest(classes = TodoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-public class BaseTestContainer extends AbstractTest implements HasLogger {
+@SpringBootTest(classes = TodoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class BaseTestContainer extends DBBaseTestContainer {
+
+    @LocalServerPort
+    private Integer port;
 
     protected static WebDriver driver;
     protected static int screenShotNumber = 0;
-    protected final String baseUrl = "http://localhost:8080";
-
-
-    static MySQLContainer<?> container = new MySQLContainer<>("mysql");
-
-    static {
-        container
-                .withUsername("user")
-                .withPassword("password")
-                .withDatabaseName("todoapp")
-                .withExposedPorts(3306)
-                .waitingFor(Wait.forHealthcheck())
-                .start();
-    }
-
-    @DynamicPropertySource
-    public static void properties(DynamicPropertyRegistry registry) {
-
-        registry.add("spring.datasource.url", container::getJdbcUrl);
-        registry.add("spring.datasource.username", container::getUsername);
-        registry.add("spring.datasource.password", container::getPassword);
-    }
+    protected  String baseUrl;
 
     @BeforeAll
     static void beforeAll() {
@@ -80,7 +56,7 @@ public class BaseTestContainer extends AbstractTest implements HasLogger {
                 if (!localScreenshots.exists() || !localScreenshots.isDirectory()) {
                     localScreenshots.mkdirs();
                 }
-
+                method = method.replaceAll(" ", "_");
                 File screenshot = new File(localScreenshots, String.format("%04d", screenShotNumber++) + "_" + className + "_" + method + "_"  + ".png");
                 FileUtils.moveFile(screenshotTakingDriver.getScreenshotAs(OutputType.FILE), screenshot);
                 getLogger().info("Screenshot for class={} method={} saved in: {}", className, method, screenshot.getAbsolutePath());
@@ -96,6 +72,11 @@ public class BaseTestContainer extends AbstractTest implements HasLogger {
         LocalDateTime timestamp = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd__HH_mm");
         return timestamp.format(formatter);
+    }
+
+    @PostConstruct
+    public void init() {
+        baseUrl = "http://localhost:" + port;
     }
 
 
