@@ -40,7 +40,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
 
 @Testcontainers
 @SpringBootTest(classes = TodoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -62,7 +61,7 @@ public class BaseTestContainer extends DBBaseTestContainer {
     @Value("${test.browser}")
     public void setBrowserOption(String browser) {
         browserOption = browser;
-        webContainer = WebContainer.getWebContainer(browser);
+        webContainer = WebContainer.startAndGetWebContainer(browser);
     }
 
     @LocalServerPort
@@ -165,7 +164,10 @@ public class BaseTestContainer extends DBBaseTestContainer {
         } else {
             getLogger().warn("Test class or method information is not available for screenshot.");
         }
-        printBrowserLogs();
+        if( driver instanceof ChromeDriver) {
+            printBrowserLogs();
+        }
+
         if (driver != null) {
             // driver.quit();
         }

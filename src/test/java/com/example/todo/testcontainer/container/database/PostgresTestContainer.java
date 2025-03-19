@@ -8,7 +8,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.utility.MountableFile;
 
-@ActiveProfiles("postgres-test")
+@ActiveProfiles({"test", "postgres-test"})
 public class PostgresTestContainer extends AbstractTest implements HasLogger {
 
 

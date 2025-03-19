@@ -8,7 +8,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
-@ActiveProfiles("mariadb-test")
+@ActiveProfiles({"test", "mariadb-test"})
 public class MariadbTestContainer extends AbstractTest implements HasLogger {
 
 

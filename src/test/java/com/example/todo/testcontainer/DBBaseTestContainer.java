@@ -13,7 +13,7 @@ import org.testcontainers.containers.JdbcDatabaseContainer;
 import java.util.Arrays;
 
 
-public class DBBaseTestContainer extends MySQLTestContainer implements HasLogger {
+public class DBBaseTestContainer extends PostgresTestContainer implements HasLogger {
 
     @Autowired
     private Environment environment;
@@ -24,7 +24,13 @@ public class DBBaseTestContainer extends MySQLTestContainer implements HasLogger
     @PostConstruct
     public void init() {
 
-        String activeTestProfile = Arrays.stream(environment.getActiveProfiles()).filter(profile -> profile.equals("test")).findFirst().orElse(null);
+        String activeTestProfile = Arrays.stream(environment.getActiveProfiles()).filter(
+                        profile ->
+                                profile.equals("mysql-test") ||
+                                profile.equals("mariadb-test") ||
+                                profile.equals("oracle-test") ||
+                                profile.equals("postgres-test")
+                ).findFirst().orElse(null);
 
         switch (activeTestProfile) {
             case "mysql-test":
@@ -40,10 +46,10 @@ public class DBBaseTestContainer extends MySQLTestContainer implements HasLogger
                 databaseContainer = OracleTestContainer.databaseContainer;
                 break;
             case null:
-                getLogger().error ("No active test profile found", new Exception("No active test profile found"));
+                getLogger().error("No active test profile found", new Exception("No active test profile found"));
                 break;
             default:
-                getLogger().error ("No database test container found", new Exception("No database test container found"));
+                getLogger().error("No database test container found", new Exception("No database test container found"));
                 break;
         }
     }

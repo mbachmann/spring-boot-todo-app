@@ -8,11 +8,11 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.MySQLContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
-@ActiveProfiles("mysql-test")
+@ActiveProfiles({"test", "mysql-test"})
 public class MySQLTestContainer extends AbstractTest implements HasLogger {
 
 
-    protected static MySQLContainer<?> databaseContainer = new MySQLContainer<>("mysql");
+    public static MySQLContainer<?> databaseContainer = new MySQLContainer<>("mysql");
 
     static {
         databaseContainer

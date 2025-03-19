@@ -17,7 +17,7 @@ public class WebContainer {
     public static BrowserWebDriverContainer<?> webContainer;
 
 
-    public static BrowserWebDriverContainer<?> getWebContainer(String browser) {
+    public static BrowserWebDriverContainer<?> startAndGetWebContainer(String browser) {
         webContainer = new BrowserWebDriverContainer<>();
         return switch (browser) {
             case "chrome" -> {

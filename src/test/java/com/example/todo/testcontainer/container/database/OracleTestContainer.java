@@ -8,7 +8,7 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.oracle.OracleContainer;
 import org.testcontainers.utility.DockerImageName;
 
-@ActiveProfiles("oracle-test")
+@ActiveProfiles({"test", "oracle-test"})
 public class OracleTestContainer extends AbstractTest implements HasLogger {
 
     public static OracleContainer databaseContainer = new OracleContainer(DockerImageName.parse("gvenzl/oracle-free:23-slim-faststart"));
