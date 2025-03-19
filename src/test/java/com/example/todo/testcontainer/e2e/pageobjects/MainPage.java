@@ -1,15 +1,20 @@
 package com.example.todo.testcontainer.e2e.pageobjects;
 
+import com.example.todo.utils.HasLogger;
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.Wait;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-public class MainPage {
+public class MainPage implements HasLogger {
 
     private final WebDriver driver;
-    public final By listNameField = By.id("listNameTextField");
+    public final By listNameInputField = By.id("listNameTextField");
     public final By todoListNameItems = By.cssSelector(".todo-list-name-item");
     private final By deleteButtons = By.cssSelector(".todo-actions a[onclick^='deleteTodoList']");
     private final By pageTitle = By.cssSelector(".page-title");
@@ -25,19 +30,19 @@ public class MainPage {
     public WebElement h1;
 
     public void enterListNameField(String name) {
-        WebElement inputField = driver.findElement(listNameField);
-        inputField.sendKeys(name);
+        WebElement inputField = driver.findElement(listNameInputField);
+        inputField.sendKeys(name );
         assert getListNameFieldValue().equals(name) ;
         inputField.sendKeys(Keys.ENTER);
     }
 
     public void clearListNameField() {
-        WebElement inputField = driver.findElement(listNameField);
+        WebElement inputField = driver.findElement(listNameInputField);
         inputField.clear();
     }
 
     public void executeKeyBoardEventEnter(String script) {
-        WebElement inputField = driver.findElement(listNameField);
+        WebElement inputField = driver.findElement(listNameInputField);
         ((JavascriptExecutor) driver).executeScript(
                 "var event = new KeyboardEvent('keypress', { keyCode: 13, which: 13, bubbles: true }); " +
                        "arguments[0].dispatchEvent(event);",
@@ -46,7 +51,7 @@ public class MainPage {
     }
 
     public String getPlaceholderOfListNameField() {
-        return driver.findElement(listNameField).getAttribute("placeholder");
+        return driver.findElement(listNameInputField).getAttribute("placeholder");
     }
 
     public List<WebElement> getTodoLists() {
@@ -71,7 +76,7 @@ public class MainPage {
     }
 
     public String getListNameFieldValue() {
-        return driver.findElement(listNameField).getAttribute("value");
+        return driver.findElement(listNameInputField).getAttribute("value");
     }
 
     public void editTodoList(String existingName) {
@@ -92,5 +97,19 @@ public class MainPage {
 
     public void navigateToHome(String baseUrl) {
         driver.get(baseUrl);
+    }
+
+    public void navigateToHome(Wait<WebDriver> wait, String listName) {
+        wait.until(ExpectedConditions.numberOfElementsToBeMoreThan(By.cssSelector(".todo-list-name-item"), 1));
+        sleep(100);
+        wait.until(ExpectedConditions.titleIs("To-Do Lists"));
+    }
+
+    private void sleep(long milliSeconds) {
+        try {
+            TimeUnit.MILLISECONDS.sleep(milliSeconds);
+        } catch (InterruptedException e) {
+            getLogger().info(Arrays.toString(e.getStackTrace()));
+        }
     }
 }

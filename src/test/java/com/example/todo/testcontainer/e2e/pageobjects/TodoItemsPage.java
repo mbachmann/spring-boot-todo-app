@@ -2,6 +2,7 @@ package com.example.todo.testcontainer.e2e.pageobjects;
 
 import com.example.todo.utils.HasLogger;
 import org.openqa.selenium.By;
+import org.openqa.selenium.Keys;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
@@ -40,8 +41,15 @@ public class TodoItemsPage implements HasLogger {
     }
 
     public void enterTask(String taskName) {
-        WebElement input = driver.findElement(taskInputField);
-        input.sendKeys(taskName + "\n"); // Press Enter
+        WebElement inputField = driver.findElement(taskInputField);
+        inputField.clear();
+        inputField.sendKeys(taskName);
+        assert getTaskNameFieldValue().equals(taskName) ;
+        inputField.sendKeys(Keys.ENTER);
+    }
+
+    private String getTaskNameFieldValue() {
+        return driver.findElement(taskInputField).getAttribute("value");
     }
 
     public boolean isTaskPresent(String taskName) {
@@ -68,9 +76,8 @@ public class TodoItemsPage implements HasLogger {
         WebElement editButton = driver.findElement(By.xpath("//span[contains(text(), '" + oldTaskName + "')]" +
                 "/following-sibling::span/a[contains(@onclick, 'editTodoItem')]"));
         editButton.click();
-        WebElement inputField = driver.findElement(By.id("taskNameTextField"));
-        inputField.clear();
-        inputField.sendKeys(newTaskName + "\n");
+        assert getTaskNameFieldValue().equals(oldTaskName) ;
+        enterTask(newTaskName);
     }
 
     public void toggleTaskDone(String taskName) {

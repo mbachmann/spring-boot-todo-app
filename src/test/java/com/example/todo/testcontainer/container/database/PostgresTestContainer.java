@@ -1,4 +1,4 @@
-package com.example.todo.testcontainer;
+package com.example.todo.testcontainer.container.database;
 
 import com.example.todo.AbstractTest;
 import com.example.todo.utils.HasLogger;
@@ -6,17 +6,16 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
 import org.testcontainers.utility.MountableFile;
 
 @ActiveProfiles("postgres-test")
 public class PostgresTestContainer extends AbstractTest implements HasLogger {
 
 
-    static PostgreSQLContainer<?> container = new PostgreSQLContainer<>("postgres:16");
+    public static PostgreSQLContainer<?> databaseContainer = new PostgreSQLContainer<>("postgres:16");
 
     static {
-        container
+        databaseContainer
                 .withCopyFileToContainer(MountableFile.forClasspathResource("postgres/schema.sql"),
                 "/docker-entrypoint-initdb.d/schema.sql")
                 .withUsername("todoapp-user")
@@ -30,9 +29,9 @@ public class PostgresTestContainer extends AbstractTest implements HasLogger {
     @DynamicPropertySource
     public static void properties(DynamicPropertyRegistry registry) {
 
-        registry.add("spring.datasource.url", container::getJdbcUrl);
-        registry.add("spring.datasource.username", container::getUsername);
-        registry.add("spring.datasource.password", container::getPassword);
+        registry.add("spring.datasource.url", databaseContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", databaseContainer::getUsername);
+        registry.add("spring.datasource.password", databaseContainer::getPassword);
     }
 
 }

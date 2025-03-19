@@ -2,9 +2,8 @@ package com.example.todo.testcontainer.e2e.tests;
 
 import com.example.todo.testcontainer.BaseTestContainer;
 import com.example.todo.testcontainer.e2e.pageobjects.TodoItemsPage;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.FluentWait;
@@ -14,6 +13,7 @@ import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TodoItemsE2ETest extends BaseTestContainer {
 
     private Wait<WebDriver> wait;
@@ -29,18 +29,28 @@ public class TodoItemsE2ETest extends BaseTestContainer {
         todoItemsPage = new TodoItemsPage(driver);
         driver.get(baseUrl);
         todoItemsPage.navigateToTodoItemList(wait, "To-Do List for business");
+
+    }
+
+    @Order(1)
+    @Test
+    public void testTasksAreLoaded() {
+        assertTrue(todoItemsPage.isTaskPresent("Create a project plan"), "Task Create a project plan should be present");
+        ((JavascriptExecutor) driver).executeScript("console.log('hello javascript console log');");
     }
 
 
+    @Order(2)
     @Test
     public void testAddEditToggleAndDeleteTask() {
         String taskName = "Test Task";
         String updatedTaskName = "Updated Task";
-
         takeScreenshot(getClass().getSimpleName(), "To-Do List for business");
 
         // Add Task
         todoItemsPage.enterTask(taskName);
+
+        takeScreenshot(getClass().getSimpleName(), "Task should be entered");
         assertTrue(todoItemsPage.isTaskPresent(taskName), "Task should be added");
         takeScreenshot(getClass().getSimpleName(), "Task should be added");
 
@@ -65,13 +75,6 @@ public class TodoItemsE2ETest extends BaseTestContainer {
         int listSize = todoItemsPage.getTaskListSize();
         todoItemsPage.deleteTask(wait, updatedTaskName);
         assertEquals(todoItemsPage.getTaskListSize(), listSize - 1, "Task should be deleted");
-        takeScreenshot(getClass().getSimpleName(), "Task should be deleted");
     }
 
-    @AfterEach
-    public void tearDown() {
-        if (driver != null) {
-            // driver.quit();
-        }
-    }
 }

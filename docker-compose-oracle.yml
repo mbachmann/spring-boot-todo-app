@@ -19,7 +19,7 @@ services:
       todoapp-oracle-free:
         condition: service_healthy
 
-  todo-adminer:
+  todo-adminer-oracle:
     image: dockette/adminer
     container_name: todoapp-adminer-on-oracle
     restart: unless-stopped
@@ -54,7 +54,7 @@ services:
       # Where our data will be persisted
     volumes:
       - todoapp-oracledata:/opt/oracle/oradata
-      - ./oracle/init_users.sql:/opt/oracle/scripts/startup/init_users.sql
+      - ./docker-config/oracle/init_users.sql:/opt/oracle/scripts/startup/init_users.sql
 # Names our volume
 volumes:
   todoapp-oracledata:

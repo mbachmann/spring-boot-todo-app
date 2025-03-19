@@ -39,7 +39,6 @@ public class VersionPageE2ETest extends BaseTestContainer {
         String titleAbout = "Application Version Info";
         assertThat(driver.getTitle()).isEqualTo(titleAbout);
         assertThat(versionPage.getPageTitle()).isEqualTo("Version Information");
-        takeScreenshot(getClass().getSimpleName(), "checkTheCorrectTitle");
     }
 
     @Test

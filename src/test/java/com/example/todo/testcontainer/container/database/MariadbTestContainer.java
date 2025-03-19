@@ -1,21 +1,21 @@
-package com.example.todo.testcontainer;
+package com.example.todo.testcontainer.container.database;
 
 import com.example.todo.AbstractTest;
 import com.example.todo.utils.HasLogger;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.testcontainers.containers.MySQLContainer;
+import org.testcontainers.containers.MariaDBContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
-@ActiveProfiles("mysql-test")
-public class MySQLTestContainer extends AbstractTest implements HasLogger {
+@ActiveProfiles("mariadb-test")
+public class MariadbTestContainer extends AbstractTest implements HasLogger {
 
 
-    static MySQLContainer<?> container = new MySQLContainer<>("mysql");
+    public static MariaDBContainer<?> databaseContainer = new MariaDBContainer<>("mariadb:11.7.2-ubi");
 
     static {
-        container
+        databaseContainer
                 .withUsername("user")
                 .withPassword("password")
                 .withDatabaseName("todoapp")
@@ -27,9 +27,9 @@ public class MySQLTestContainer extends AbstractTest implements HasLogger {
     @DynamicPropertySource
     public static void properties(DynamicPropertyRegistry registry) {
 
-        registry.add("spring.datasource.url", container::getJdbcUrl);
-        registry.add("spring.datasource.username", container::getUsername);
-        registry.add("spring.datasource.password", container::getPassword);
+        registry.add("spring.datasource.url", databaseContainer::getJdbcUrl);
+        registry.add("spring.datasource.username", databaseContainer::getUsername);
+        registry.add("spring.datasource.password", databaseContainer::getPassword);
     }
 
 }

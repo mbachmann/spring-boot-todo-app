@@ -15,6 +15,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+
 @DisplayName("Main Page e2e Test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MainPageE2ETest extends BaseTestContainer {
@@ -33,6 +34,7 @@ class MainPageE2ETest extends BaseTestContainer {
 
         mainPage = new MainPage(driver);
         driver.get(baseUrl);
+        mainPage.navigateToHome(wait, "To-Do List for business");
     }
 
     @AfterEach
@@ -44,19 +46,16 @@ class MainPageE2ETest extends BaseTestContainer {
     @Order(1)
     @DisplayName("I see 'To-Do Lists' as a title")
     void checkTheCorrectTitle () {
-        mainPage.navigateToHome(baseUrl);
         assertThat(driver.getTitle()).isEqualTo("To-Do Lists");
         assertThat(mainPage.getPageTitle()).isEqualTo("To-Do Lists");
         assertThat(mainPage.h1.getText()).isEqualTo("To-Do Lists");
         assertThat(mainPage.getPlaceholderOfListNameField()).isEqualTo("Input new List Name then tap Enter to add");
-        takeScreenshot(getClass().getSimpleName(), "checkTheCorrectTitle");
     }
 
     @Test
     @Order(2)
     @DisplayName("I see 4 'To-Do Lists' and their names")
     void mainPageTodoLists() {
-        mainPage.navigateToHome(baseUrl);
         assertThat(mainPage.getTodoLists().size()).isEqualTo(4);
         assertThat(mainPage.getTodoListNameItemATag("To-Do List for business").getText()).isEqualTo("To-Do List for business");
         assertThat(mainPage.getTodoListNameItemATag("To-Do List for homework").getText()).isEqualTo("To-Do List for homework");
@@ -68,15 +67,12 @@ class MainPageE2ETest extends BaseTestContainer {
     @Order(3)
     @DisplayName("I can add a 'New To-Do List'")
     void mainPageAddANewList() {
-        mainPage.navigateToHome(baseUrl);
         mainPage.enterListNameField(newList);
         wait.until(ExpectedConditions.numberOfElementsToBe(mainPage.todoListNameItems, 5));
         assertThat(mainPage.getTodoLists().size()).isEqualTo(5);
 
         List<WebElement> lists = mainPage.getTodoLists();
         assertThat(lists.stream().anyMatch(el -> el.getText().equals(newList))).isTrue();
-        takeScreenshot(getClass().getSimpleName(), "mainPageAddANewList");
-
     }
 
     @Test
@@ -88,16 +84,14 @@ class MainPageE2ETest extends BaseTestContainer {
         assertThat(mainPage.getTodoListNameItemATag(newList).getText()).isEqualTo(newList);
 
         mainPage.editTodoList(newList);
-        wait.until(ExpectedConditions.attributeContains(mainPage.listNameField, "value", newList));
+        wait.until(ExpectedConditions.attributeContains(mainPage.listNameInputField, "value", newList));
 
         mainPage.clearListNameField();
         mainPage.enterListNameField(renamedList);
-
         wait.until(ExpectedConditions.visibilityOfElementLocated(mainPage.getTodoListNameItemATagSelector(renamedList)));
 
         List<WebElement> lists = mainPage.getTodoLists();
         assertThat(lists.stream().anyMatch(el -> el.getText().equals(renamedList))).isTrue();
-        takeScreenshot(getClass().getSimpleName(), "mainPageRenameTheNewListToRenamed");
     }
 
     @Test
@@ -109,7 +103,6 @@ class MainPageE2ETest extends BaseTestContainer {
         mainPage.getTodoListNameItemATag(renamedList).click();
         wait.until(ExpectedConditions.titleIs(titleTodoItems));
         assertThat(driver.getTitle()).isEqualTo(titleTodoItems);
-        takeScreenshot(getClass().getSimpleName(), "mainPageNavigateToRenamedList");
     }
 
     @Test
@@ -119,7 +112,6 @@ class MainPageE2ETest extends BaseTestContainer {
         mainPage.deleteTodoList(renamedList);
         wait.until(ExpectedConditions.numberOfElementsToBe(mainPage.todoListNameItems, 4));
         assertThat(mainPage.getTodoLists().size()).isEqualTo(4);
-        takeScreenshot(getClass().getSimpleName(), "mainPageDeleteRenamedList");
     }
 
     @Test
@@ -130,6 +122,5 @@ class MainPageE2ETest extends BaseTestContainer {
         mainPage.clickAboutButton();
         wait.until(ExpectedConditions.titleIs(titleAbout));
         assertThat(driver.getTitle()).isEqualTo(titleAbout);
-        takeScreenshot(getClass().getSimpleName(), "mainPageNavigateToAbout");
     }
 }
