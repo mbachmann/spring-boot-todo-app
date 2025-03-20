@@ -3,6 +3,7 @@ package com.example.todo.testcontainer;
 import com.example.todo.TodoApplication;
 import com.example.todo.testcontainer.container.web.WebContainer;
 import jakarta.annotation.PostConstruct;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.Dimension;
 import org.openqa.selenium.OutputType;
@@ -13,13 +14,18 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.firefox.FirefoxDriverLogLevel;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.logging.LogEntries;
 import org.openqa.selenium.logging.LogType;
+import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.logging.Logs;
 import org.openqa.selenium.remote.AbstractDriverOptions;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -34,12 +40,15 @@ import org.testcontainers.shaded.org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 @Testcontainers
 @SpringBootTest(classes = TodoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -47,26 +56,41 @@ import java.util.concurrent.TimeUnit;
 @ContextConfiguration(initializers = BaseTestContainer.Initializer.class)
 public class BaseTestContainer extends DBBaseTestContainer {
 
-    public static String testOption;
-    public static String browserOption;
+    private static final Logger log = LoggerFactory.getLogger(BaseTestContainer.class);
+    public static String testOption = null;
+    public static String browserOption= null;
+    public static String loggingOption = null;
     public static String screenshotFolder = null;
     public static BrowserWebDriverContainer<?> webContainer;
 
 
+    // Option can be local, grid, webcontainer
     @Value("${test.option}")
     public void setTestOption(String option) {
         testOption = option;
+        if (testOption != null && browserOption != null &&  testOption.equalsIgnoreCase("webcontainer")) {
+            webContainer = WebContainer.startAndGetWebContainer(browserOption);
+        }
     }
 
+    // Option can be chrome, firefox, edge
     @Value("${test.browser}")
     public void setBrowserOption(String browser) {
         browserOption = browser;
-        webContainer = WebContainer.startAndGetWebContainer(browser);
+        if (testOption != null && browserOption != null &&  testOption.equalsIgnoreCase("webcontainer")) {
+            webContainer = WebContainer.startAndGetWebContainer(browserOption);
+        }
+    }
+
+
+    // Option can be none, browser, all
+    @Value("${test.webdriver.logging.options}")
+    public void setLoggingOption(String option) {
+        loggingOption = option;
     }
 
     @LocalServerPort
     private Integer port;
-
 
     protected static int screenShotNumber = 0;
     protected static String baseUrl;
@@ -75,73 +99,40 @@ public class BaseTestContainer extends DBBaseTestContainer {
 
     @BeforeAll
     void beforeAll() throws MalformedURLException {
-
         DesiredCapabilities capabilities = new DesiredCapabilities();
         AbstractDriverOptions<?> driverOptions = null;
-        if (testOption.equals("local")) {
-            switch (browserOption) {
-                case "chrome":
-                    ChromeOptions chromeOptions = new ChromeOptions();
-                    driver = new ChromeDriver(chromeOptions);
-                    driverOptions = chromeOptions.merge(capabilities);
-                    break;
-                case "firefox":
-                    FirefoxOptions firefoxOptions = new FirefoxOptions();
-                    driver = new FirefoxDriver(firefoxOptions);
-                    driverOptions = firefoxOptions.merge(capabilities);
-                    break;
-                case "edge":
-                    EdgeOptions edgeOptions = new EdgeOptions();
-                    driver = new EdgeDriver(edgeOptions);
-                    driverOptions = edgeOptions.merge(capabilities);
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Browser not supported");
-            }
 
-
-        } else {
-            switch (browserOption) {
-                case "chrome":
-                    capabilities.setBrowserName("chrome");
-                    ChromeOptions chromeOptions = new ChromeOptions();
-                    chromeOptions.addArguments("--headless");
-
-                    driverOptions = chromeOptions.merge(capabilities);
-                    break;
-                case "firefox":
-                    capabilities.setBrowserName("firefox");
-                    FirefoxOptions firefoxOptions = new FirefoxOptions();
-                    firefoxOptions.addArguments("-headless");
-                    driverOptions = firefoxOptions.merge(capabilities);
-                    break;
-                case "edge":
-                    capabilities.setBrowserName("MicrosoftEdge");
-                    EdgeOptions edgeOptions = new EdgeOptions();
-                    edgeOptions.addArguments("--headless");
-                    driverOptions = edgeOptions.merge(capabilities);
-
-                    break;
-                default:
-                    throw new UnsupportedOperationException("Browser not supported");
-            }
-            if (testOption.equals("grid")) {
-                driver = new RemoteWebDriver(Paths.get("http://localhost:4444").toUri().toURL(), capabilities);
-            } else {
+        switch(testOption) {
+            case "local":
+                driverOptions = getLocalWebDriver(capabilities);
+                baseUrl = "http://localhost:" + port;
+                break;
+            case "webcontainer":
+                driverOptions = getRemoteWebDriver(capabilities);
                 driver = new RemoteWebDriver(webContainer.getSeleniumAddress(), driverOptions);
+                baseUrl = "http://host.testcontainers.internal:" + port;
                 getLogger().info("Remote Webdriver Selenium Address: {}", webContainer.getSeleniumAddress());
-            }
+                break;
+            case "grid":
+                driverOptions = getRemoteWebDriver(capabilities);
+                driver = new RemoteWebDriver(new URL("http://localhost:4444"), driverOptions);
+                baseUrl = "http://host.docker.internal:" + port;
+                break;
+            default:
+                throw new UnsupportedOperationException("Test option not supported");
         }
+
         assert driverOptions != null;
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
+        Dimension windowSize = driver.manage().window().getSize();
+        // driver.manage().window().setSize(new Dimension(1800,1100));
 
         getLogger().info("Webdriver started at url: {} with browser: [{}] [{}] and test option: [{}] selected: ",
                 baseUrl, driverOptions.getBrowserName(),  driverOptions.getBrowserVersion(), testOption);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
-        Dimension windowSize = driver.manage().window().getSize();
-        getLogger().info("Tests with Window size: {}", windowSize);
-        // driver.manage().window().setSize(new Dimension(1800,1100));
-    }
 
+        getLogger().info("Tests with Window size: {}", windowSize);
+
+    }
 
     @AfterAll
     static void afterAll() {
@@ -164,15 +155,104 @@ public class BaseTestContainer extends DBBaseTestContainer {
         } else {
             getLogger().warn("Test class or method information is not available for screenshot.");
         }
-        if( driver instanceof ChromeDriver) {
-            printBrowserLogs();
-        }
 
-        if (driver != null) {
-            // driver.quit();
+        if( browserOption.equals("chrome") || browserOption.equals("edge")) {
+            switch(loggingOption) {
+                case "browser":
+                    printBrowserLogs();
+                    break;
+                case "all":
+                    printAllLogs();
+                    break;
+                default:
+                    break;
+            }
         }
-
     }
+
+    @PostConstruct
+    public void init() {
+        if (testOption.equals("local")) {
+            baseUrl = "http://localhost:" + port;
+        }
+    }
+
+    private AbstractDriverOptions<?> getLocalWebDriver(DesiredCapabilities capabilities) {
+        LoggingPreferences logPrefs = getLoggingPreferences();
+        AbstractDriverOptions<?> driverOptions;
+        switch (browserOption) {
+            case "chrome":
+                ChromeOptions chromeOptions = new ChromeOptions();
+                chromeOptions.setCapability("goog:loggingPrefs", logPrefs);
+                driver = new ChromeDriver(chromeOptions);
+                driverOptions = chromeOptions.merge(capabilities);
+                break;
+            case "firefox":
+                FirefoxProfile firefoxProfile = new FirefoxProfile();
+                firefoxProfile.setPreference("devtools.console.stdout.content", true);
+                FirefoxOptions firefoxOptions = new FirefoxOptions();
+                firefoxOptions.setLogLevel(FirefoxDriverLogLevel.INFO);
+                // Browser logs in Firefox are not working
+                // firefoxOptions.setCapability("moz:loggingPrefs", logPrefs);
+                firefoxOptions.setProfile(firefoxProfile);
+                driver = new FirefoxDriver(firefoxOptions);
+                driverOptions = firefoxOptions.merge(capabilities);
+                break;
+            case "edge":
+                EdgeOptions edgeOptions = new EdgeOptions();
+                edgeOptions.setCapability(EdgeOptions.LOGGING_PREFS, logPrefs);
+                driver = new EdgeDriver(edgeOptions);
+                driverOptions = edgeOptions.merge(capabilities);
+                break;
+            default:
+                throw new UnsupportedOperationException("Browser not supported");
+        }
+        return driverOptions;
+    }
+
+
+    private AbstractDriverOptions<?> getRemoteWebDriver(DesiredCapabilities capabilities) {
+        AbstractDriverOptions<?> driverOptions;
+        LoggingPreferences logPrefs = getLoggingPreferences();
+        switch (browserOption) {
+            case "chrome":
+                capabilities.setBrowserName("chrome");
+                ChromeOptions chromeOptions = new ChromeOptions();
+                chromeOptions.setCapability("goog:loggingPrefs", logPrefs);
+                chromeOptions.addArguments("--headless");
+                driverOptions = chromeOptions.merge(capabilities);
+                break;
+            case "firefox":
+                capabilities.setBrowserName("firefox");
+                FirefoxOptions firefoxOptions = new FirefoxOptions();
+                firefoxOptions.addArguments("-headless");
+                driverOptions = firefoxOptions.merge(capabilities);
+                break;
+            case "edge":
+                capabilities.setBrowserName("MicrosoftEdge");
+                EdgeOptions edgeOptions = new EdgeOptions();
+                edgeOptions.setCapability(EdgeOptions.LOGGING_PREFS, logPrefs);
+                edgeOptions.addArguments("--headless");
+                driverOptions = edgeOptions.merge(capabilities);
+
+                break;
+            default:
+                throw new UnsupportedOperationException("Browser not supported");
+        }
+        return driverOptions;
+    }
+
+    private @NotNull LoggingPreferences getLoggingPreferences() {
+        LoggingPreferences logPrefs = new LoggingPreferences();
+        logPrefs.enable(LogType.BROWSER, Level.ALL);
+        logPrefs.enable(LogType.PERFORMANCE, Level.INFO);
+        logPrefs.enable(LogType.PROFILER, Level.INFO);
+        logPrefs.enable(LogType.CLIENT, Level.INFO);
+        logPrefs.enable(LogType.DRIVER, Level.INFO);
+        logPrefs.enable(LogType.SERVER, Level.INFO);
+        return logPrefs;
+    }
+
 
     protected void sleep(int milliSeconds) {
         try {
@@ -210,19 +290,27 @@ public class BaseTestContainer extends DBBaseTestContainer {
         return timestamp.format(formatter);
     }
 
-    @PostConstruct
-    public void init() {
-        if (testOption.equals("local")) {
-            baseUrl = "http://localhost:" + port;
-        }
-    }
-
     protected void printBrowserLogs() {
 
         try {
             Logs logs = driver.manage().logs();
             LogEntries logEntries = logs.get(LogType.BROWSER);
             logEntries.forEach(entry -> getLogger().info(entry.toString()));
+        } catch (Exception e) {
+            getLogger().info("Failed to get browser logs");
+        }
+    }
+
+    protected void printAllLogs() {
+
+        try {
+            Logs logs = driver.manage().logs();
+            Set<String> logTypes = logs.getAvailableLogTypes();
+            logTypes.forEach(logType -> {
+                getLogger().info(logType);
+                LogEntries logEntries = logs.get(logType);
+                logEntries.forEach(entry -> getLogger().info(entry.toString()));
+        });
         } catch (Exception e) {
             getLogger().info("Failed to get browser logs");
         }
