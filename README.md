@@ -134,15 +134,8 @@ This project is licensed under the MIT License.
 
 Maintained by [mbachmann](https://github.com/mbachmann).
 
-
-
 <br/>
-## Content
 
-- [Setup the project](#setup-spring-initializr)
-- [Build the backend](#create-the-data-model)
-- [Build the frontend](#implement-client)
-- [Deploy the application with docker](#creating-and-deploying-a-container)
 
 ## Overview
 
