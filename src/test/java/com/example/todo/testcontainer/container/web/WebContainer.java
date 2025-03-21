@@ -4,6 +4,7 @@ import com.example.todo.TodoApplication;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.edge.EdgeOptions;
 import org.openqa.selenium.firefox.FirefoxOptions;
+import org.openqa.selenium.safari.SafariOptions;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -52,6 +53,18 @@ public class WebContainer {
                 case "edge" -> {
                     webContainer
                             .withCapabilities(new EdgeOptions())
+                            // .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.RECORD_ALL, new File("build"))
+                            //.dependsOn(databaseContainer)
+                            //.withNetwork(databaseContainer.getNetwork())
+                            .withAccessToHost(true)
+                            .start();
+                    isWebContainerStarted = true;
+                    yield webContainer;
+                }
+
+                case "safari" -> {
+                    webContainer
+                            .withCapabilities(new SafariOptions())
                             // .withRecordingMode(BrowserWebDriverContainer.VncRecordingMode.RECORD_ALL, new File("build"))
                             //.dependsOn(databaseContainer)
                             //.withNetwork(databaseContainer.getNetwork())

@@ -3097,10 +3097,14 @@ The selenium grid http://localhost:4444 is started with the following services:
 The configuration for the tests is set in the _application-test.properties_ file in the test resources folder _src/test/resources_.
 
 ```properties
-# chrome, firefox, edge; not supported ie, opera, safari
-test.browser=${TEST_BROWSER:chrome}
+# chrome, firefox, edge; safari is only supported for local tests on MacOS. Not supported ie, opera
+test.browser=${TEST_BROWSER:safari}
 # local, grid, webcontainer
 test.option=${TEST_OPTION:webcontainer}
+
+# logging supported by chrome and edge
+# all, browser, none
+test.webdriver.logging.options=browser
 ```
 
 ### Configuration of the Database Container
@@ -3182,4 +3186,20 @@ TodoAppE2eTest>BaseTestContainer.beforeAll:122 » SessionNotCreated Could not st
 This error occurs when the browser is not installed or the browser is not found or the grid is not started (with test.option=grid).
 
 
+```shell-error
+org.openqa.selenium.SessionNotCreatedException: Could not start a new session. Response code 500. Message: Could not create a session: You must enable 'Allow remote automation' in the Developer section of Safari Settings to control Safari via WebDriver. 
+```
+
+This error occurs when the Safari browser is not configured for WebDriver. Open the settings dialog in Safari and enable the _Allow remote automation_.
+
+![safari-settings.png](readme/safari-settings.png)
+
+
+```shell-error
+Caused by: java.lang.UnsupportedOperationException: Browser name must be 'chrome', 'firefox' or 'MicrosoftEdge';provided 'safari' is not supported
+```
+
+The BrowserWebContainer does not support the Safari browser. Use Chrome, Firefox or Edge.
+For testing with Safari use the local option or expand the test by using
+a cloud service like BrowserStack or SauceLabs.
 
