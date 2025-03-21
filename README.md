@@ -3024,33 +3024,106 @@ This script runs only after the db has been created the first time.
 
 ## Selenium Tests with Test Container
 
-The Selenium tests are located in the _src/test/java/com/examplr/todo/testcontainer/e2e_ folder. 
+The Selenium Tests with Test Container are located in the branch _test-container_:
+https://github.com/mbachmann/spring-boot-todo-app/tree/test-container
+
+The source code of the Selenium tests are located in the _src/test/java/com/examplr/todo/testcontainer/e2e_ folder. 
 The tests are written in Java and use the Selenium WebDriver.
 
-The _TestContainers_ library is used to start a container with the todo-app and a container with the database.
+The _TestContainers_ library is used to start a container with the todo-app and a container with the database 
+and optionally a container with the browser.
 
 The requirements for running the e2e tests are:
 
-- Docker is installed
-- Chrome is installed (if not headless)
-- ChromeDriver is automatically installed in the Test Container
+### Local Tests
 
-The TestContainer is started by the _BaseTestContainer_ class. It containers a MySQL database.
-The properties are set in the _application-mysql-test.properties_ file in the test resources folder _src/test/resources_.
+For local tests we need to have the following installed:
 
-This property file is set in the BaseTestContainer with:
+- Docker is installed and Docker Engine is running
+- Chrome and or Firefox and or Edge browser is installed on the local computer
+- On Mac OS tests could be executed with Safari
 
-```java
-    @ActiveProfiles("mysql-test")
+### Remote Tests with web container
+
+For remote tests we need to have the following installed:
+
+- Docker is installed and Docker Engine is running
+
+### Remote Tests with a local Selenium Grid
+
+For remote tests with a local Selenium Grid we need to have the following installed:
+
+- Docker is installed and Docker Engine is running
+- Selenium Grid hast been started with the command:
+
+```shell
+docker compose -f docker-compose-selenium-grid.yml up
 ```
 
-The BaseTestContainer class is making sure the TodoApp and Database are started before the tests are run.
+or on Mac OS:
 
-- The todo-app is running on port 8080
-- The database is running on port 3306
-- The database has a schema with the name _db_
-- The database has a user _user_ with the password _todoapp_
+```shell 
+docker compose -f docker-compose-selenium-grid-arm64.yml up
+```
 
+The selenium grid http://localhost:4444 is started with the following services:
+
+![selenium-grid.png](readme/selenium-grid.png)
+
+### Configuration of the web and browser option
+
+The configuration for the tests is set in the _application-test.properties_ file in the test resources folder _src/test/resources_.
+
+```properties
+# chrome, firefox, edge; not supported ie, opera, safari
+test.browser=${TEST_BROWSER:chrome}
+# local, grid, webcontainer
+test.option=${TEST_OPTION:webcontainer}
+```
+
+### Configuration of the Database Container
+
+The Database TestContainer can be:
+
+- MySQL
+- Mariadb
+- Postgres
+- Oracle
+
+The database test container is inherited into the DBBaseTestContainer class. 
+
+The properties are set in the _application-xxxxx-test.properties_ file in the test resources folder _src/test/resources_.
+
+- application-mysql-test.properties
+- application-mariadb-test.properties
+- application-postgres-test.properties
+- application-oracle-test.properties
+
+The generic test properties are set in the _application-test.properties_ file in the test resources folder _src/test/resources_.
+
+This property file is set in the related Database Container class in the folder: _testcontainer/container/database_ with:
+
+```java
+    @ActiveProfiles({"test", "mariadb-test"})
+```
+
+In order to use a specific database container, adjust the inheritance in the _DBBaseTestContainer_ class.
+
+```java
+public class DBBaseTestContainer extends PostgresTestContainer implements HasLogger {
+  ..
+}
+```
+
+Following database container are implemented:
+
+- MariadbTestContainer
+- MySQLTestContainer
+- OracleTestContainer
+- PostgresTestContainer
+
+
+### Running Tests
 
 The tests are started with the command:
 
@@ -3061,21 +3134,30 @@ The tests are started with the command:
 This command starts the normal unit tests and the todo-app and the database in the Test Container, 
 runs the tests and stops the containers.
 
-The BaseClass of the Selenium tests is the _BaseTestContainer_ class.
+
+**Screenshots**
+
+During the tests, the todo-app is started in the Test Container and the database is started in the Test Container.
+After each test a screenshot is taken and saved in the _target/screenshots_ folder.
+
+**Visual Check during tests in the browser**
+
+If the selected test option is test.option=${TEST_OPTION:local} the browser is started and the tests are executed in the local browser.
+If the Driver is stared without the option _headless_, the browser is visible during the tests.
+
+**Possible Errors during execution of the tests**
+
+```shell-error
+MainPageE2ETest » NoClassDefFound Could not initialize class com.example.todo.testcontainer.BaseTestContainer
+``` 
+
+This error occurs when the TestContainer is not started due to missing docker or docker engine is not running.
+
+```shell-error
+TodoAppE2eTest>BaseTestContainer.beforeAll:122 » SessionNotCreated Could not start a new session. Possible causes are invalid address of the remote server or browser start-up failure. 
+``` 
+
+This error occurs when the browser is not installed or the browser is not found or the grid is not started (with test.option=grid).
 
 
-For visual checks during the development of the tests, 
-you can instantiate the ChromeDriver without the _headless_ option.
-
-```java
-    driver = new ChromeDriver();
-    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
-```
-
-The _headless_ option is set to _true_ for the CI/CD pipeline.
-
-```java
-    driver = new ChromeDriver(new ChromeOptions().addArguments("--headless"));
-    driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(2));
-```
 

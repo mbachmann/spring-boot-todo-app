@@ -22,8 +22,12 @@ import org.openqa.selenium.logging.LogType;
 import org.openqa.selenium.logging.LoggingPreferences;
 import org.openqa.selenium.logging.Logs;
 import org.openqa.selenium.remote.AbstractDriverOptions;
+import org.openqa.selenium.remote.Browser;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.safari.SafariDriver;
+import org.openqa.selenium.safari.SafariDriverService;
+import org.openqa.selenium.safari.SafariOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -124,6 +128,8 @@ public class BaseTestContainer extends DBBaseTestContainer {
 
         assert driverOptions != null;
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
+        driver.manage().timeouts().scriptTimeout(Duration.ofMinutes(2));
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(10));
         Dimension windowSize = driver.manage().window().getSize();
         // driver.manage().window().setSize(new Dimension(1800,1100));
 
@@ -190,6 +196,10 @@ public class BaseTestContainer extends DBBaseTestContainer {
             case "firefox":
                 FirefoxProfile firefoxProfile = new FirefoxProfile();
                 firefoxProfile.setPreference("devtools.console.stdout.content", true);
+                // firefoxProfile.setPreference("media.navigator.permission.disabled", true);
+                // firefoxProfile.setPreference("media.peerconnection.ice.tcp", true);
+                // firefoxProfile.setPreference("media.navigator.streams.fake", true);
+                // firefoxProfile.setAcceptUntrustedCertificates(true);
                 FirefoxOptions firefoxOptions = new FirefoxOptions();
                 firefoxOptions.setLogLevel(FirefoxDriverLogLevel.INFO);
                 // Browser logs in Firefox are not working
@@ -204,6 +214,14 @@ public class BaseTestContainer extends DBBaseTestContainer {
                 driver = new EdgeDriver(edgeOptions);
                 driverOptions = edgeOptions.merge(capabilities);
                 break;
+            case "safari":
+                SafariOptions safariOptions = new SafariOptions();
+                SafariDriverService safariService = new SafariDriverService.Builder()
+                        .withLogging(true)
+                        .build();
+                driver = new SafariDriver(safariService, safariOptions);
+                driverOptions = safariOptions.merge(capabilities);
+                break;
             default:
                 throw new UnsupportedOperationException("Browser not supported");
         }
@@ -216,25 +234,32 @@ public class BaseTestContainer extends DBBaseTestContainer {
         LoggingPreferences logPrefs = getLoggingPreferences();
         switch (browserOption) {
             case "chrome":
-                capabilities.setBrowserName("chrome");
+                capabilities.setBrowserName(Browser.CHROME.browserName());
                 ChromeOptions chromeOptions = new ChromeOptions();
                 chromeOptions.setCapability("goog:loggingPrefs", logPrefs);
                 chromeOptions.addArguments("--headless");
                 driverOptions = chromeOptions.merge(capabilities);
                 break;
             case "firefox":
-                capabilities.setBrowserName("firefox");
+                capabilities.setBrowserName(Browser.FIREFOX.browserName());
                 FirefoxOptions firefoxOptions = new FirefoxOptions();
                 firefoxOptions.addArguments("-headless");
                 driverOptions = firefoxOptions.merge(capabilities);
                 break;
             case "edge":
-                capabilities.setBrowserName("MicrosoftEdge");
+                capabilities.setBrowserName(Browser.EDGE.browserName());
                 EdgeOptions edgeOptions = new EdgeOptions();
                 edgeOptions.setCapability(EdgeOptions.LOGGING_PREFS, logPrefs);
                 edgeOptions.addArguments("--headless");
                 driverOptions = edgeOptions.merge(capabilities);
-
+            case "safari":
+                capabilities.setBrowserName(Browser.SAFARI.browserName());
+                SafariOptions safariOptions = new SafariOptions();
+                SafariDriverService safariService = new SafariDriverService.Builder()
+                        .withLogging(true)
+                        .build();
+                driver = new SafariDriver(safariService, safariOptions);
+                driverOptions = safariOptions.merge(capabilities);
                 break;
             default:
                 throw new UnsupportedOperationException("Browser not supported");
