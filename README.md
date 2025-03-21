@@ -3056,12 +3056,6 @@ or by the IDE.
 The Selenium Tests with Test Container are located in the branch _test-container_:
 https://github.com/mbachmann/spring-boot-todo-app/tree/test-container
 
-
-## Selenium Tests with Test Container
-
-The Selenium Tests with Test Container are located in the branch _test-container_:
-https://github.com/mbachmann/spring-boot-todo-app/tree/test-container
-
 The source code of the Selenium tests are located in the _src/test/java/com/examplr/todo/testcontainer/e2e_ folder. 
 The tests are written in Java and use the Selenium WebDriver.
 
