@@ -1,5 +1,15 @@
 # Spring Boot (v 3.4.2) To-Do List Application
 
+## Content
+
+- [Setup the Project](#setup-spring-initializr)
+- [Build the Backend](#create-the-data-model)
+- [Build the Frontend](#implement-client)
+- [Deploy the Application with Docker](#creating-and-deploying-a-container)
+- [Install Traefik Reverse Proxy on a remote Ubuntu Linux System](traefik/README.md)
+- [Unit Tests](#unit-tests)
+- [Selenium Tests with Test Container](#selenium-tests-with-test-container)
+
 ## Overview
 
 This is a Spring Boot MVC application for managing To-Do lists and their items. The frontend is implemented using Thymeleaf and jQuery, while the backend exposes a REST API for managing To-Do lists and items.
@@ -3020,6 +3030,31 @@ There are examples of Traefik for _mysql_ and _postgres_ including _adminer_:
 
 For the postgres version is a folder postgres with a schema.sql file for creating the database schema.
 This script runs only after the db has been created the first time.
+
+## Unit Tests
+
+The Todo-App is secured by UnitTests. The tests are located in the folder _src/test/java_. The tests are executed with the command:
+
+```shell
+./mvnw test
+```
+
+or 
+
+```shell
+mvn test
+```
+
+or by the IDE.
+
+![unit-tests.png](readme/unit-tests.png)
+
+
+
+## Selenium Tests with Test Container
+
+The Selenium Tests with Test Container are located in the branch _test-container_:
+https://github.com/mbachmann/spring-boot-todo-app/tree/test-container
 
 
 ## Selenium Tests with Test Container
