@@ -1,5 +1,6 @@
 package com.example.todo.rest;
 
+import com.example.todo.TodoApplication;
 import com.example.todo.model.TodoListName;
 import com.example.todo.repository.TodoListNameRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(classes= TodoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureMockMvc
 @Transactional
 public class TodoListNameControllerIT {
