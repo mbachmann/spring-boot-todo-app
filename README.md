@@ -1,5 +1,15 @@
 # Spring Boot (v 3.4.2) To-Do List Application
 
+## Content
+
+- [Setup the Project](#setup-spring-initializr)
+- [Build the Backend](#create-the-data-model)
+- [Build the Frontend](#implement-client)
+- [Deploy the Application with Docker](#creating-and-deploying-a-container)
+- [Install Traefik Reverse Proxy on a remote Ubuntu Linux System](traefik/README.md)
+- [Unit Tests](#unit-tests)
+- [Selenium Tests with Test Container](#selenium-tests-with-test-container)
+
 ## Overview
 
 This is a Spring Boot MVC application for managing To-Do lists and their items. The frontend is implemented using Thymeleaf and jQuery, while the backend exposes a REST API for managing To-Do lists and items.
@@ -79,6 +89,8 @@ docker build -t spring-boot-todo-app .
 docker run -p 8080:8080 spring-boot-todo-app
 ```
 
+More instructions here: [Creating and Deploying a Container](#creating-and-deploying-a-container).
+
 ## Usage
 
 ### Main Page (`index.html`)
@@ -127,12 +139,7 @@ Maintained by [mbachmann](https://github.com/mbachmann).
 
 
 <br/>
-## Content
 
-- [Setup the project](#setup-spring-initializr)
-- [Build the backend](#create-the-data-model)
-- [Build the frontend](#implement-client)
-- [Deploy the application with docker](#creating-and-deploying-a-container)
 
 ## Overview
 
@@ -2902,9 +2909,6 @@ Replace **uportal** with your **dockerhub id**.
 <br/>
 
 ```yaml
-
-version: '3'
-
 services:
   todo-app-mysql:
     image: uportal/todo-app:latest
@@ -2973,7 +2977,7 @@ volumes:
 
 ### Create a docker-compose-h2-traefik-v3.yml file
 
-The installation ofthe reverse proxy Traefik V3 on a linux server is described here: [README.md](traefik/README.md)
+The installation of the reverse proxy Traefik V3 on a linux server is described here: [README.md](traefik/README.md)
 
 
 The _docker-compose-h2.yml_ contains one service with the name _todo-app-h2_. The environment variables are used for defining the application name and with active spring profiles.
@@ -3020,3 +3024,28 @@ There are examples of Traefik for _mysql_ and _postgres_ including _adminer_:
 
 For the postgres version is a folder postgres with a schema.sql file for creating the database schema.
 This script runs only after the db has been created the first time.
+
+## Unit Tests
+
+The Todo-App is secured by UnitTests. The tests are located in the folder _src/test/java_. The tests are executed with the command:
+
+```shell
+./mvnw test
+```
+
+or 
+
+```shell
+mvn test
+```
+
+or by the IDE.
+
+![unit-tests.png](readme/unit-tests.png)
+
+
+
+## Selenium Tests with Test Container
+
+The Selenium Tests with Test Container are located in the branch _test-container_:
+https://github.com/mbachmann/spring-boot-todo-app/tree/test-container
