@@ -1,0 +1,60 @@
+
+services:
+  todo-app-oracle:
+    image: uportal/todo-app:latest
+    container_name: todoapp-on-oracle-free
+    restart: unless-stopped
+    environment:
+      APP_NAME: Todo App with Oracle Free
+      ACTIVE_PROFILES: dev,oracle
+      APP_URL: http://localhost:8080
+      APP_DB_HOST: todoapp-oracle-free
+      APP_DB_PORT: 1521
+      APP_DB_SERVICE_NAME: FREEPDB1
+      APP_DB_USERNAME: demouser
+      APP_DB_PASSWORD: password
+    ports:
+      - 8080:8080
+    depends_on:
+      todoapp-oracle-free:
+        condition: service_healthy
+
+  todo-adminer-oracle:
+    image: dockette/adminer
+    container_name: todoapp-adminer-on-oracle
+    restart: unless-stopped
+    ports:
+      - 9090:80
+    environment:
+      ADMINER_DEFAULT_SERVER: todoapp-oracle-free
+    depends_on:
+      todoapp-oracle-free:
+        condition: service_healthy
+
+
+  todoapp-oracle-free:
+    image: container-registry.oracle.com/database/free:latest-lite
+    # image: oracle/database:12.1.0.2-ee
+    container_name: todoapp-oracle-free
+    restart: unless-stopped
+    environment:
+      ORACLE_PWD: password #  the password for the SYS, SYSTEM and PDBADMIN
+      ORACLE_CHARACTERSET: AL32UTF8
+      ENABLE_ARCHIVELOG: true
+      ENABLE_FORCE_LOGGING: true
+      # A system identifier (SID) identifies each Oracle database instance for internal connectivity on the Oracle server itself.
+      # not supported on free database
+      # ORACLE_SID: ORCLCDB
+      # A PDB is a portable collection of schemas, schema objects, and nonschema objects that appears to an Oracle Net client as a separate database.
+      ORACLE_PDB: FREEPDB1
+
+    ports:
+      - 15211:1521
+      - 55001:5500
+      # Where our data will be persisted
+    volumes:
+      - todoapp-oracledata:/opt/oracle/oradata
+      - ./docker-config/oracle/init_users.sql:/opt/oracle/scripts/startup/init_users.sql
+# Names our volume
+volumes:
+  todoapp-oracledata:

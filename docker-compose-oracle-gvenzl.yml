@@ -1,0 +1,63 @@
+
+services:
+  todo-app-oracle-gvenzl:
+    image: uportal/todo-app:latest
+    container_name: todoapp-on-oracle-gvenzl-free
+    restart: unless-stopped
+    environment:
+      APP_NAME: Todo App with Oracle Free
+      ACTIVE_PROFILES: dev,oracle
+      APP_URL: http://localhost:8080
+      APP_DB_HOST: todoapp-oracle-gvenzl-free
+      APP_DB_PORT: 1521
+      APP_DB_SERVICE_NAME: FREEPDB1
+      APP_DB_USERNAME: demouser
+      APP_DB_PASSWORD: password
+    ports:
+      - 8080:8080
+    depends_on:
+      todoapp-oracle-gvenzl-free:
+        condition: service_healthy
+
+  todo-adminer-oracle-gvenzl:
+    image: dockette/adminer
+    container_name: todoapp-adminer-on-oracle-gvenzl
+    restart: unless-stopped
+    ports:
+      - 9090:80
+    environment:
+      ADMINER_DEFAULT_SERVER: todoapp-oracle-gvenzl-free
+    depends_on:
+      todoapp-oracle-gvenzl-free:
+        condition: service_healthy
+
+
+  todoapp-oracle-gvenzl-free:
+    image: gvenzl/oracle-free:23.5-faststart
+
+    # image: oracle/database:12.1.0.2-ee
+    container_name: todoapp-oracle-gvenzl-free
+    restart: unless-stopped
+    environment:
+      ORACLE_PASSWORD: password #  the password for the SYS, SYSTEM and PDBADMIN
+      # ORACLE_RANDOM_PASSWORD: true #  the password for the SYS, SYSTEM and PDBADMIN
+      APP_USER: demouser
+      APP_USER_PASSWORD: password
+    ports:
+      - 15211:1521
+      - 55001:5500
+      # Where our data will be persisted
+    volumes:
+      - todoapp-oracledata-gvenzl:/opt/oracle/oradata
+      # - ./docker-config/oracle/init_users.sql:/opt/oracle/scripts/startup/init_users.sql
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+      start_interval: 5s
+
+# Names our volume
+volumes:
+  todoapp-oracledata-gvenzl:

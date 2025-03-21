@@ -55,7 +55,8 @@ services:
       # Where our data will be persisted
     volumes:
       - todoapp-dbpostgres16:/var/lib/postgresql/data
-      - ./postgres/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - ./docker-config/postgres/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}" ]
       interval: 10s
