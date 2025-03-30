@@ -10,6 +10,16 @@ services:
     image: traefik:v3.3
     container_name: traefik
     restart: unless-stopped
+    logging:
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: [ "CMD", "traefik", "healthcheck", "--ping" ]
+      timeout: 1s
+      interval: 10s
+      retries: 3
+      start_period: 10s
     security_opt:
       - no-new-privileges:true
     environment:
@@ -19,28 +29,40 @@ services:
       - localnet
     ports:
       - 80:80 # HTTP entryPoints
-      - 443:443 # HTTPS entryPoints
+      - 443:443
+      - 8082:8082 # http://localhost:8082/ping and http://localhost:8082/metrics
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro # Docker socket to watch for Traefik
       - ./traefik.yml:/traefik.yml:ro # Traefik config file
-      - ./traefik_dynamic.yml.yml:/traefik_dynamic.yml.yml:ro  # dynamic traefik configuration
+      - ./traefik_dynamic.yml:/traefik_dynamic.yml:ro  # dynamic traefik configuration
       - traefik-certs:/certs # Docker volume to store the acme file for the Certifactes
+      - /var/log/traefik/:/var/log/traefik/
     labels:
       - "traefik.enable=true"
 
       # define basic auth middleware for dashboard
       - "traefik.http.middlewares.traefik-auth.basicauth.removeheader=true"
-      - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:create-password"
+      - "traefik.http.middlewares.traefik-auth.basicauth.users=admin:$$2y$$05$$4Vq5sey9.o6fyXMWKV7KGufvJ6aofuticDwOsBhBaxV0VQfy/37bW" # CHANGE PASSWORD!! (user: foobar / pwd: foobar)
+      # how to set a real password: admin r....p
       # sudo apt-get install apache2-utils
       # htpasswd -Bnb username password | sed -e s/\\$/\\$\\$/g
 
       # define traefik dashboard router and service
-      - "traefik.http.routers.traefik.rule=Host(`traefik.example.com`)" # change hostname!
+      - "traefik.http.routers.traefik.rule=Host(`traefik.united-portal.com`)" # change hostname!
       - "traefik.http.routers.traefik.service=api@internal"
       - "traefik.http.routers.traefik.tls.certresolver=lets-encrypt"
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.middlewares=traefik-auth, secHeaders@file, autodetectContenttype@file"
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+
+  docker-host:
+    image: qoomon/docker-host
+    restart: unless-stopped
+    container_name: docker-host
+    cap_add: ["NET_ADMIN", "NET_RAW"]
+    networks:
+      - localnet
+
 volumes:
   traefik-certs:
     name: traefik-certs
