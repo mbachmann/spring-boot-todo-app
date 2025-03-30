@@ -1,5 +1,6 @@
 package com.example.todo.service;
 
+import com.example.todo.TodoApplication;
 import com.example.todo.dto.TodoItemListsDTO;
 import com.example.todo.model.TodoItem;
 import com.example.todo.model.TodoListName;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +21,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ContextConfiguration(classes= TodoApplication.class)
 @ExtendWith(MockitoExtension.class)
 class TodoItemServiceTest {
 

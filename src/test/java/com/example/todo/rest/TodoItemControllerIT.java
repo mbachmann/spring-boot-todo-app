@@ -1,5 +1,6 @@
 package com.example.todo.rest;
 
+import com.example.todo.TodoApplication;
 import com.example.todo.model.TodoItem;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +16,7 @@ import java.util.UUID;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
+@SpringBootTest(classes= TodoApplication.class)
 @AutoConfigureMockMvc
 class TodoItemControllerIT {
 
