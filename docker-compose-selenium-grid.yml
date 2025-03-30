@@ -30,7 +30,7 @@ services:
     image: selenium/hub:4.29.0-20250303
     container_name: selenium-hub
     extra_hosts:
-    - "host.docker.internal:host-gateway"
+      - "host.docker.internal:host-gateway"
     ports:
       - "4442:4442"
       - "4443:4443"

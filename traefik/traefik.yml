@@ -8,7 +8,7 @@ metrics:
     addRoutersLabels: true
     addEntryPointsLabels: true
     addServicesLabels: true
-    # entryPoint: traefik  # default port for traefik is 8080, if the entryPoint named traefik is not configured, it will be automatically created on port 8080.
+    entryPoint: "srvs"  # default port for traefik is 8080, if the entryPoint named traefik is not configured, it will be automatically created on port 8080.
     buckets:
       - 0.1
       - 0.3
@@ -16,7 +16,7 @@ metrics:
       - 5.0
 
 ping:
-  entryPoint: "ping"
+  entryPoint: "srvs"
 
 entryPoints:
   web:
@@ -29,7 +29,7 @@ entryPoints:
           scheme: https
   websecure:
     address: ":443"
-  ping:
+  srv:
     address: ":8082"
 serversTransport:
   insecureSkipVerify: true
@@ -43,7 +43,7 @@ providers:
 certificatesResolvers:
   lets-encrypt:
     acme:
-      email: m.bachmann@united.ch
+      email: john.doe@example.com
       storage: /certs/acme.json
       # caServer: https://acme-v02.api.letsencrypt.org/directory # prod (default)
       # caServer: https://acme-staging-v02.api.letsencrypt.org/directory # staging

@@ -29,7 +29,8 @@ services:
       - localnet
     ports:
       - 80:80 # HTTP entryPoints
-      - 443:443 # HTTPS entryPoints
+      - 443:443
+      - 8082:8082 # http://localhost:8082/ping and http://localhost:8082/metrics
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro # Docker socket to watch for Traefik
       - ./traefik.yml:/traefik.yml:ro # Traefik config file
@@ -53,6 +54,15 @@ services:
       - "traefik.http.routers.traefik.entrypoints=websecure"
       - "traefik.http.routers.traefik.middlewares=traefik-auth, secHeaders@file, autodetectContenttype@file"
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+
+  docker-host:
+    image: qoomon/docker-host
+    restart: unless-stopped
+    container_name: docker-host
+    cap_add: ["NET_ADMIN", "NET_RAW"]
+    networks:
+      - localnet
+
 volumes:
   traefik-certs:
     name: traefik-certs
