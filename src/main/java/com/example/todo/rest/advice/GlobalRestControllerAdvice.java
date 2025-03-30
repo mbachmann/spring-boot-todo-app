@@ -41,7 +41,7 @@ public class GlobalRestControllerAdvice //extends ResponseEntityExceptionHandler
         // String message = e.getMessage();
         //might actually prefer to use a geeric mesasge
 
-        String message = "Problem occured";
+        String message = "Problem occured: " + e.getMessage();
         UUID uuid = UUID.randomUUID();
         String logRef = uuid.toString();
         logger.error("logRef=" + logRef, message, e);
