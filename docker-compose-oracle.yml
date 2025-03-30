@@ -47,7 +47,11 @@ services:
       # ORACLE_SID: ORCLCDB
       # A PDB is a portable collection of schemas, schema objects, and nonschema objects that appears to an Oracle Net client as a separate database.
       ORACLE_PDB: FREEPDB1
-
+    healthcheck:
+      test: [ "CMD", "/opt/oracle/checkDBStatus.sh"]
+      interval: 20s
+      timeout: 20s
+      retries: 60
     ports:
       - 15211:1521
       - 55001:5500
