@@ -27,6 +27,7 @@
    <description>Demo project for Spring Boot</description>
    <properties>
       <java.version>21</java.version>
+       <timestamp>${maven.build.timestamp}</timestamp>
       <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
    </properties>
    <dependencies>
@@ -50,6 +51,10 @@
          <groupId>org.springframework.boot</groupId>
          <artifactId>spring-boot-starter-actuator</artifactId>
       </dependency>
+       <dependency>
+           <groupId>io.micrometer</groupId>
+           <artifactId>micrometer-registry-prometheus-simpleclient</artifactId>
+       </dependency>
       <dependency>
          <groupId>com.h2database</groupId>
          <artifactId>h2</artifactId>
