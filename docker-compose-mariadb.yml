@@ -14,6 +14,8 @@ services:
       APP_DB_NAME: db
       APP_DB_USERNAME: root
       APP_DB_PASSWORD: todoapp
+      LOKI_URL: http://localhost:3100/loki/api/v1/push
+      LOKI_ENABLED: false
     ports:
       - 8080:8080
     depends_on:

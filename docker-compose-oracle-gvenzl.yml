@@ -13,6 +13,8 @@ services:
       APP_DB_SERVICE_NAME: FREEPDB1
       APP_DB_USERNAME: demouser
       APP_DB_PASSWORD: password
+      LOKI_URL: http://localhost:3100/loki/api/v1/push
+      LOKI_ENABLED: false
     ports:
       - 8080:8080
     depends_on:

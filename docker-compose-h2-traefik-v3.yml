@@ -20,4 +20,5 @@ services:
       APP_NAME: Todo Rest with Spring Boot and H2
       ACTIVE_PROFILES: dev,h2
       APP_URL: https://todo-h2.example.com # change hostname!
-
+      LOKI_URL: http://localhost:3100/loki/api/v1/push
+      LOKI_ENABLED: false
