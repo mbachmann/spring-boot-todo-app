@@ -59,7 +59,7 @@ class GlobalRestControllerAdviceTest {
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
         assertNotNull(response.getBody());
         assertNotNull(response.getBody().getLogRef());
-        assertEquals("Problem occured", response.getBody().getMessage());
+        assertEquals("Problem occured: Unexpected error occurred", response.getBody().getMessage());
     }
 
     @Test
