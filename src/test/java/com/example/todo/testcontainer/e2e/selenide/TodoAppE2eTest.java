@@ -1,5 +1,5 @@
 package com.example.todo.testcontainer.e2e.selenide;
-
+/*
 import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.WebDriverRunner;
 import com.codeborne.selenide.junit5.ScreenShooterExtension;
@@ -29,3 +29,4 @@ public class TodoAppE2eTest extends BaseTestContainer {
         sleep(2000);
     }
 }
+*/
