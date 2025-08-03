@@ -62,24 +62,6 @@ public class TodoApplication {
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")));
     }
 
-    @Bean
-    public CorsFilter corsFilter() {
-        final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        final CorsConfiguration config = new CorsConfiguration();
-        config.setAllowCredentials(false);
-        config.addAllowedOrigin("*");
-        config.addAllowedHeader("Authorization");
-        config.addAllowedHeader("X-AUTH-TOKEN");
-        config.addAllowedHeader("Content-Type");
-        config.addAllowedMethod("OPTIONS");
-        config.addAllowedMethod("GET");
-        config.addAllowedMethod("POST");
-        config.addAllowedMethod("PUT");
-        config.addAllowedMethod("DELETE");
-        config.addAllowedMethod("PATCH");
-        source.registerCorsConfiguration("/**", config);
-        return new CorsFilter(source);
-    }
 
     @Bean
     MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
