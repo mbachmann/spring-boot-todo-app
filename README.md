@@ -219,7 +219,7 @@ Add the following libraries to the _pom.xml_ file:
   <dependency>
     <groupId>org.springdoc</groupId>
     <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-    <version>3.0.1</version>
+    <version>3.0.3</version>
   </dependency>
 
 ```
@@ -249,14 +249,23 @@ The Mockito dependency requires a plugin:
 </plugin>
 ```
 
-For the extraction of information from the _pom.xml_ file, we need the following dependency:
+For the extraction of information from the _pom.xml_ file, the current implementation uses Java XML APIs
+(`DocumentBuilderFactory` + `XPath`) and does not require an additional Maven model dependency.
+
+To expose build metadata (for example build time) add the Spring Boot `build-info` goal:
 
 ```xml
-     <dependency>
-         <groupId>org.apache.maven</groupId>
-         <artifactId>maven-model</artifactId>
-         <version>3.9.6</version>
-      </dependency>
+<plugin>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-maven-plugin</artifactId>
+  <executions>
+    <execution>
+      <goals>
+        <goal>build-info</goal>
+      </goals>
+    </execution>
+  </executions>
+</plugin>
 ```
 
 We can add information about our source code repository and maven build stamp to the _pom.xml_ file:
@@ -277,7 +286,8 @@ We can add information about our source code repository and maven build stamp to
    <description>Demo project for Spring Boot</description>
    <properties>
       <java.version>25</java.version>
-      <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+      <timestamp>${maven.build.timestamp}</timestamp>
+      <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
    </properties>
 ```
 
@@ -1531,11 +1541,12 @@ public class ResourceNotFoundException extends RuntimeException {
 
 ## The TodoApplication
 
-We are producing some console output, configuring openApi and configuring cors.
+We are producing some console output and configuring OpenAPI in `TodoApplication`.
 
 ```java
 package com.example.todo;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -1546,6 +1557,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.micrometer.metrics.autoconfigure.MeterRegistryCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.env.Environment;
 import org.springframework.web.cors.CorsConfiguration;
@@ -1557,63 +1569,50 @@ import java.util.Arrays;
 @SpringBootApplication
 public class TodoApplication {
 
-  @Autowired
-  private Environment env;
+    @Autowired
+    private Environment env;
 
-  public static void main(String[] args) {
-    SpringApplication.run(TodoApplication.class, args);
-  }
-
-  @PostConstruct
-  public void afterInit() {
-    boolean hasDevProfile = Arrays.asList(env.getActiveProfiles()).contains("dev");
-    boolean hasH2Database = Arrays.asList(env.getActiveProfiles()).contains("h2");
-    String appUrl = env.getProperty("todoapp.server");
-    String applicationName = env.getProperty("spring.application.name");
-    String openApiInfo="";
-    String h2ConsoleInfo="";
-    if (hasDevProfile) {
-      openApiInfo = appUrl + "/v3/api-docs\n" +
-              appUrl + "/v3/api-docs.yaml -> yaml file is downloaded -> https://editor.swagger.io/\n" +
-              appUrl + "/swagger-ui.html \n";
+    public static void main(String[] args) {
+        SpringApplication.run(TodoApplication.class, args);
     }
-    if (hasH2Database) {
-      h2ConsoleInfo= appUrl + "/h2-console  " + "" +
-              "-> mit Generic H2 (Embedded), org.h2.Driver, jdbc:h2:mem:testdb und sa \n";
+
+    @PostConstruct
+    public void afterInit() {
+        boolean hasDevProfile = Arrays.asList(env.getActiveProfiles()).contains("dev");
+        boolean hasH2Database = Arrays.asList(env.getActiveProfiles()).contains("h2");
+        String appUrl = env.getProperty("todoapp.server");
+        String applicationName = env.getProperty("spring.application.name");
+        String openApiInfo="";
+        String h2ConsoleInfo="";
+        if (hasDevProfile) {
+            openApiInfo = appUrl + "/v3/api-docs\n" +
+                    appUrl + "/v3/api-docs.yaml -> yaml file is downloaded -> https://editor.swagger.io/\n" +
+                    appUrl + "/swagger-ui.html \n";
+        }
+        if (hasH2Database) {
+            h2ConsoleInfo= appUrl + "/h2-console  " + "" +
+                    "-> mit Generic H2 (Embedded), org.h2.Driver, jdbc:h2:mem:testdb und sa \n";
+        }
+        System.out.println("\n\nApplication [" + applicationName + "] - Enter in Browser:\n" + appUrl + " \n" +
+                openApiInfo +
+                h2ConsoleInfo + "\n" +
+                "Active Profiles: " + Arrays.toString(env.getActiveProfiles()) + "\n\n");
     }
-    System.out.println("\n\nApplication [" + applicationName + "] - Enter in Browser:\n" + appUrl + " \n" +
-            openApiInfo +
-            h2ConsoleInfo + "\n" +
-            "Active Profiles: " + Arrays.toString(env.getActiveProfiles()) + "\n\n");
-  }
 
-  @Bean
-  public OpenAPI customOpenAPI(@Value("${springdoc.version}") String appVersion, @Value("${todoapp.server}") String contextPath) {
-    return new OpenAPI()
-            .addServersItem(new Server().url(contextPath))
-            .components(new Components())
-            .info(new Info().title("API for Todo App").version(appVersion)
-                    .license(new License().name("Apache 2.0").url("http://springdoc.org")));
-  }
+    @Bean
+    public OpenAPI customOpenAPI(@Value("${springdoc.version}") String appVersion, @Value("${todoapp.server}") String contextPath) {
+        return new OpenAPI()
+                .addServersItem(new Server().url(contextPath))
+                .components(new Components())
+                .info(new Info().title("API for Todo App").version(appVersion)
+                        .license(new License().name("Apache 2.0").url("http://springdoc.org")));
+    }
 
-  @Bean
-  public CorsFilter corsFilter() {
-    final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-    final CorsConfiguration config = new CorsConfiguration();
-    config.setAllowCredentials(false);
-    config.addAllowedOrigin("*");
-    config.addAllowedHeader("Authorization");
-    config.addAllowedHeader("X-AUTH-TOKEN");
-    config.addAllowedHeader("Content-Type");
-    config.addAllowedMethod("OPTIONS");
-    config.addAllowedMethod("GET");
-    config.addAllowedMethod("POST");
-    config.addAllowedMethod("PUT");
-    config.addAllowedMethod("DELETE");
-    config.addAllowedMethod("PATCH");
-    source.registerCorsConfiguration("/**", config);
-    return new CorsFilter(source);
-  }
+    @Bean
+    MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
+        String applicationName = env.getProperty("spring.application.name");
+        return registry -> registry.config().commonTags("application", applicationName);
+    }
 
 }
 
@@ -1624,10 +1623,9 @@ The _TodoApplication_ class has the following methods:
 - **main()**, starts the application.
 - **afterInit()**, prints the application url, openApi and h2 console info.
 - **customOpenAPI()**, creates the OpenAPI.
-- **corsFilter()**, creates the CorsFilter.
+- **metricsCommonTags()**, adds a common Micrometer tag for the application name.
 
-Instead of using the _@CrossOrigin_ annotation at REST controller class level, we are using the _CorsFilter_ to allow all origins.
-The _CorsFilter_ is configured to allow all origins, headers and methods.
+CORS is configured in a dedicated configuration class `src/main/java/com/example/todo/config/CorsConfig.java`.
 
 <br/>
 
@@ -1641,10 +1639,10 @@ want to add.
 
 
 ```properties
-spring.profiles.active=${ACTIVE_PROFILES:dev,postgres}
+spring.profiles.active=${ACTIVE_PROFILES:dev,h2}
 server.port=8080
 
-spring.application.name=${APP_NAME:Todo Application}
+spring.application.name=${APP_NAME:Todo-Application}
 
 # spring.liquibase.change-log=classpath:/db/changelog/db.changelog-master.yaml
 
@@ -1652,7 +1650,61 @@ springdoc.api-docs.enabled=false
 
 todoapp.server=${APP_URL:http://localhost:8080}
 
+logging.level.org.springframework.*=warn
+
 auto-populate-db=true
+
+# ===============================
+# actuator endpoints
+#
+# http://localhost:8080/actuator
+#
+# http://localhost:8080/actuator/health
+# http://localhost:8080/actuator/health/readiness
+# http://localhost:8080/actuator/health/liveness
+#
+# http://localhost:8080/actuator/info
+#
+# http://localhost:8080/actuator/metrics
+# http://localhost:8080/actuator/metrics/application.ready.time
+# http://localhost:8080/actuator/metrics/jvm.memory.used
+# ...
+# http://localhost:8080/actuator/prometheus
+
+management.server.port=8080
+
+management.endpoint.health.access=unrestricted
+management.endpoint.health.show-details=always
+management.endpoint.health.show-components=always
+management.endpoint.health.probes.enabled=true
+management.endpoint.health.group.liveness.show-details=always
+management.endpoint.health.group.readiness.show-details=always
+
+management.metrics.enable.all=true
+management.metrics.tags.application=${spring.application.name}
+management.endpoint.prometheus.access=unrestricted
+management.endpoint.metrics.access=unrestricted
+management.prometheus.metrics.export.enabled=true
+management.prometheus.metrics.export.step=60
+management.metrics.distribution.percentiles-histogram.all=true
+management.metrics.distribution.percentiles.all=0.5,0.75,0.95,0.98,0.99
+
+management.endpoints.web.exposure.include=health,info,metrics,prometheus,livenessstate
+management.info.env.enabled=true
+
+# ===============================
+# INFO endpoint
+info.app.name=${APP_NAME:Todo Application}
+info.app.version=@version@
+info.app.buildtime=@timestamp@
+info.app.server=${APP_URL:http://localhost:8080}
+info.app.java-version=${java.version}
+
+# CORS Configuration for class config/CorsConfig
+endpoints.web.cors.path-mappings=/**
+endpoints.web.cors.allowed-methods=OPTIONS, GET, POST, PUT, DELETE, PATCH
+endpoints.web.cors.allowed-headers=*
+endpoints.web.cors.allowed-origins=http://localhost:4200, http://localhost:8080
 
 
 
@@ -1817,56 +1869,189 @@ In controllers folder, adding VersionController.java.
 ```java
 package com.example.todo.controller;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringBootVersion;
+import org.springframework.boot.info.BuildProperties;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.ui.Model;
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.util.Properties;
+
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 @Controller
 public class VersionController {
 
+    private static final Path POM_PATH = Path.of("pom.xml");
+    private static final String UNKNOWN = "Unknown";
+
+    private final ObjectProvider<BuildProperties> buildPropertiesProvider;
+
+    public VersionController(ObjectProvider<BuildProperties> buildPropertiesProvider) {
+        this.buildPropertiesProvider = buildPropertiesProvider;
+    }
+
+    @Value("${project.version:Unknown}")
+    private String projectVersion;
+
+    @Value("${java.version:Unknown}")
+    private String javaVersion;
+
     @GetMapping("/version")
-    public String showVersionPage(org.springframework.ui.Model model) {
-        try {
-
-            MavenXpp3Reader mavenXpp3Reader = new MavenXpp3Reader();
-            Model pomModel;
-            if ((new File("pom.xml")).exists()) {
-                pomModel = mavenXpp3Reader.read(new FileReader("pom.xml"));
-            }
-            else {
-                // Packaged artifacts contain a META- INF/maven/${groupId}/${artifactId}/pom.properties
-                pomModel = mavenXpp3Reader.read(new
-                        InputStreamReader(VersionController.class.getResourceAsStream(
-                        "/META-INF/maven/com.example/todo/pom.xml")));
-            }
-            model.addAttribute("projectVersion", pomModel.getVersion());
-            model.addAttribute("springBootVersion", pomModel.getParent().getVersion());
-            model.addAttribute("javaVersion", pomModel.getProperties().getProperty("java.version"));
-            model.addAttribute("springDocVersion", pomModel.getDependencies().stream()
-                    .filter(dep -> "springdoc-openapi-starter-webmvc-ui".equals(dep.getArtifactId()))
-                    .findFirst()
-                    .map(Dependency::getVersion)
-                    .orElse("Unknown"));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public String showVersionPage(Model model) {
+        PomMetadata pomMetadata = readPomMetadata();
+        model.addAttribute("projectVersion", resolveProjectVersion(pomMetadata));
+        model.addAttribute("springBootVersion", resolveSpringBootVersion(pomMetadata));
+        model.addAttribute("javaVersion", resolveJavaVersion(pomMetadata));
+        model.addAttribute("springDocVersion", resolveSpringDocVersion(pomMetadata));
+        model.addAttribute("buildTime", resolveBuildTime(pomMetadata));
         return "version-template";
+    }
+
+    private String resolveProjectVersion(PomMetadata pomMetadata) {
+        if (isResolvedValue(pomMetadata.projectVersion())) return pomMetadata.projectVersion();
+        if (isResolvedValue(projectVersion)) return projectVersion;
+        BuildProperties bp = buildPropertiesProvider.getIfAvailable();
+        if (bp != null && isResolvedValue(bp.getVersion())) return bp.getVersion();
+        String implVersion = VersionController.class.getPackage().getImplementationVersion();
+        if (isResolvedValue(implVersion)) return implVersion;
+        String pomPropVersion = getPomVersion();
+        if (isResolvedValue(pomPropVersion)) return pomPropVersion;
+        return UNKNOWN;
+    }
+
+    private String resolveSpringBootVersion(PomMetadata pomMetadata) {
+        if (isResolvedValue(pomMetadata.springBootVersion())) return pomMetadata.springBootVersion();
+        return defaultIfBlank(SpringBootVersion.getVersion());
+    }
+
+    private String resolveJavaVersion(PomMetadata pomMetadata) {
+        if (isResolvedValue(pomMetadata.javaVersion())) return pomMetadata.javaVersion();
+        if (isResolvedValue(javaVersion)) return javaVersion;
+        return System.getProperty("java.version", UNKNOWN);
+    }
+
+    private String resolveSpringDocVersion(PomMetadata pomMetadata) {
+        if (isResolvedValue(pomMetadata.springDocVersion())) return pomMetadata.springDocVersion();
+        return UNKNOWN;
+    }
+
+    private String resolveBuildTime(PomMetadata pomMetadata) {
+        String ts = pomMetadata.buildTimestamp();
+        if (isResolvedValue(ts) && !ts.contains("${")) return ts;
+        Instant buildInstant = resolveBuildInstant();
+        if (buildInstant != null) return createBuildTimeFormatter(pomMetadata).format(buildInstant);
+        return UNKNOWN;
+    }
+
+    private Instant resolveBuildInstant() {
+        BuildProperties bp = buildPropertiesProvider.getIfAvailable();
+        if (bp != null && bp.getTime() != null) return bp.getTime();
+        try (InputStream input = VersionController.class.getResourceAsStream("/META-INF/build-info.properties")) {
+            if (input == null) return null;
+            Properties properties = new Properties();
+            properties.load(input);
+            String buildTime = properties.getProperty("build.time");
+            if (!isResolvedValue(buildTime)) return null;
+            return Instant.parse(buildTime);
+        } catch (IOException | RuntimeException e) {
+            return null;
+        }
+    }
+
+    private DateTimeFormatter createBuildTimeFormatter(PomMetadata pomMetadata) {
+        String pattern = isResolvedValue(pomMetadata.buildTimestampFormat())
+                ? pomMetadata.buildTimestampFormat()
+                : "yyyy-MM-dd HH:mm";
+        return DateTimeFormatter.ofPattern(pattern).withZone(ZoneId.systemDefault());
+    }
+
+    private String getPomVersion() {
+        try (InputStream input = VersionController.class.getResourceAsStream(
+                "/META-INF/maven/com.example/todo/pom.properties")) {
+            if (input != null) {
+                Properties props = new Properties();
+                props.load(input);
+                return props.getProperty("version", UNKNOWN);
+            }
+        } catch (IOException e) {
+            // Fallback
+        }
+        return UNKNOWN;
+    }
+
+    private PomMetadata readPomMetadata() {
+        if (!Files.exists(POM_PATH)) return PomMetadata.unknown();
+        try (InputStream input = Files.newInputStream(POM_PATH)) {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
+            factory.setFeature("http://xml.org/sax/features/external-general-entities", false);
+            factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            factory.setNamespaceAware(true);
+            Document document = factory.newDocumentBuilder().parse(input);
+            XPath xPath = XPathFactory.newInstance().newXPath();
+            return new PomMetadata(
+                    evaluateXPath(xPath, document, "/*[local-name()='project']/*[local-name()='version']/text()"),
+                    evaluateXPath(xPath, document, "/*[local-name()='project']/*[local-name()='parent']/*[local-name()='version']/text()"),
+                    evaluateXPath(xPath, document, "/*[local-name()='project']/*[local-name()='properties']/*[local-name()='java.version']/text()"),
+                    evaluateXPath(xPath, document, "/*[local-name()='project']/*[local-name()='dependencies']/*[local-name()='dependency'][*[local-name()='groupId']='org.springdoc' and *[local-name()='artifactId']='springdoc-openapi-starter-webmvc-ui']/*[local-name()='version']/text()"),
+                    evaluateXPath(xPath, document, "/*[local-name()='project']/*[local-name()='properties']/*[local-name()='timestamp']/text()"),
+                    evaluateXPath(xPath, document, "/*[local-name()='project']/*[local-name()='properties']/*[local-name()='maven.build.timestamp.format']/text()")
+            );
+        } catch (IOException | ParserConfigurationException | SAXException | XPathExpressionException e) {
+            return PomMetadata.unknown();
+        }
+    }
+
+    private String evaluateXPath(XPath xPath, Document document, String expression) throws XPathExpressionException {
+        String value = (String) xPath.evaluate(expression, document, XPathConstants.STRING);
+        return defaultIfBlank(value);
+    }
+
+    private boolean isResolvedValue(String value) {
+        return value != null && !value.isBlank() && !UNKNOWN.equals(value) && !value.startsWith("${");
+    }
+
+    private String defaultIfBlank(String value) {
+        return value == null || value.isBlank() ? UNKNOWN : value;
+    }
+
+    private record PomMetadata(String projectVersion, String springBootVersion, String javaVersion,
+                               String springDocVersion, String buildTimestamp, String buildTimestampFormat) {
+
+        private static PomMetadata unknown() {
+            return new PomMetadata(UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
+        }
     }
 }
 
-``` 
+```
 
 Explanation:
 
-MavenXPP3Reader is used to read the pom.xml file. If the pom.xml file is not found, 
-the pom.properties file is read from the packaged artifact.
+The current implementation reads metadata from `pom.xml` via XML/XPath and uses additional fallbacks
+(`BuildProperties`, `META-INF/build-info.properties`, and `pom.properties`) to resolve values reliably
+in both IDE and packaged execution.
 
 
 - **showVersionPage()**, returns the version-template page.
@@ -2704,6 +2889,7 @@ And finally the _version-template.html_ in _resources/templates/version-template
         <li>Spring Boot Version: <span th:text="${springBootVersion}"></span></li>
         <li>Java Version: <span th:text="${javaVersion}"></span></li>
         <li>SpringDoc Version: <span th:text="${springDocVersion}"></span></li>
+        <li>Build Time: <span th:text="${buildTime}"></span></li>
     </ul>
 </div>
 </body>
