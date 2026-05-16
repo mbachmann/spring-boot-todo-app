@@ -19,6 +19,8 @@ services:
       APP_DB_NAME: todoapp
       APP_DB_USERNAME: root
       APP_DB_PASSWORD: todoapp
+      LOKI_URL: http://localhost:3100/loki/api/v1/push
+      LOKI_ENABLED: false
     networks:
       - internal
       - proxy

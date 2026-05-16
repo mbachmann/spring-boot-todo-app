@@ -1,0 +1,68 @@
+networks:
+  proxy:
+    external: true
+  internal:
+    external: false
+
+services:
+  docmost:
+    image: docmost/docmost:latest
+    depends_on:
+      - db
+      - redis
+    environment:
+      APP_URL: "http://localhost:3000"
+      APP_SECRET: "6247cb8ec1f96fdb7df694794d42839651cff9592f002d50342062f85619627a"
+      DATABASE_URL: "postgresql://docmost:6247cb8ec1f96fdb7df69@db:5432/docmost?schema=public"
+      REDIS_URL: "redis://redis:6379"
+      DISABLE_TELEMETRY: true
+      MAIL_DRIVER: smtp
+      SMTP_HOST: authsmtp.securemail.pro
+      SMTP_PORT: 587
+      SMTP_USERNAME: test@kapi.ch
+      SMTP_PASSWORD: 2018HalloVelo
+      SMTP_SECURE: true
+      MAIL_FROM_ADDRESS: test@kapi.ch
+      MAIL_FROM_NAME: Docmost
+      STORAGE_DRIVER: local
+      FILE_UPLOAD_SIZE_LIMIT: 1000mb
+      FILE_IMPORT_SIZE_LIMIT: 2000mb
+
+    restart: unless-stopped
+    volumes:
+      - docmost:/app/data/storage
+    networks:
+      - internal
+      - proxy
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.docmost.rule=Host(`docmost.united-portal.com`)" # change hostname!
+      - "traefik.http.routers.docmost.tls=true"
+      - "traefik.http.routers.docmost.tls.certresolver=lets-encrypt"
+      - "traefik.http.routers.docmost.entrypoints=websecure"
+      - "traefik.http.services.docmost.loadbalancer.server.port=3000"
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: docmost
+      POSTGRES_USER: docmost
+      POSTGRES_PASSWORD: 6247cb8ec1f96fdb7df69
+    restart: unless-stopped
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - internal
+  redis:
+    image: redis:7.2-alpine
+    restart: unless-stopped
+    volumes:
+      - redis_data:/data
+    networks:
+      - internal
+
+volumes:
+  docmost:
+  db_data:
+  redis_data:

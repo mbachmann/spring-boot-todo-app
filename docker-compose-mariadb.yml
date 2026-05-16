@@ -1,5 +1,3 @@
-
-
 services:
   todo-app-mariadb11:
     image: uportal/todo-app:latest
