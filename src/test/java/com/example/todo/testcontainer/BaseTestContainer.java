@@ -33,10 +33,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationContextInitializer;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.BrowserWebDriverContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
@@ -114,7 +115,7 @@ public class BaseTestContainer extends DBBaseTestContainer {
             case "webcontainer":
                 driverOptions = getRemoteWebDriver(capabilities);
                 driver = new RemoteWebDriver(webContainer.getSeleniumAddress(), driverOptions);
-                baseUrl = "http://host.testcontainers.internal:" + port;
+                baseUrl = "http://host.docker.internal:" + port;
                 getLogger().info("Remote Webdriver Selenium Address: {}", webContainer.getSeleniumAddress());
                 break;
             case "grid":
@@ -346,9 +347,9 @@ public class BaseTestContainer extends DBBaseTestContainer {
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             applicationContext.addApplicationListener(
-                    (ApplicationListener<WebServerInitializedEvent>) event -> {
-                        org.testcontainers.Testcontainers.exposeHostPorts(event.getWebServer().getPort());
-                        baseUrl = "http://host.testcontainers.internal:" + event.getWebServer().getPort();
+                    (ApplicationListener<ContextRefreshedEvent>) event -> {
+                        // Spring Boot 4: Use @LocalServerPort instead
+                        // baseUrl is set via @LocalServerPort initialization in the test class
                     }
             );
         }

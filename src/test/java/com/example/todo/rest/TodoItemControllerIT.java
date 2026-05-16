@@ -2,38 +2,49 @@ package com.example.todo.rest;
 
 import com.example.todo.TodoApplication;
 import com.example.todo.model.TodoItem;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
-import java.util.List;
 import java.util.UUID;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = TodoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureMockMvc
+@SpringBootTest(classes = {TodoApplication.class, TodoItemControllerIT.TestConfig.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class TodoItemControllerIT {
 
+    @Configuration
+    static class TestConfig {
+        @Bean
+        ObjectMapper objectMapper() {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.registerModule(new JavaTimeModule());
+            return mapper;
+        }
+    }
+
     @Autowired
-    private MockMvc mockMvc;
+    private WebApplicationContext webApplicationContext;
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    private MockMvc mockMvc;
 
     private String baseUrl;
     private final static UUID listId = UUID.randomUUID();
@@ -41,6 +52,7 @@ class TodoItemControllerIT {
 
     @BeforeEach
     void setUp() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
         baseUrl = "/api/v1";
     }
 
@@ -49,7 +61,6 @@ class TodoItemControllerIT {
     void testNewTodoItem() throws Exception {
         TodoItem item = new TodoItem();
         item.setItemId(null);
-
         item.setListId(listId);
         item.setTaskName("Test Task");
         item.setDone(false);
@@ -58,10 +69,10 @@ class TodoItemControllerIT {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(item)))
                 .andExpect(status().isOk()).andReturn();
-                //         .andExpect(jsonPath("$.taskName").value("Test Task"));
+
         String content = result.getResponse().getContentAsString();
         TodoItem data = objectMapper.readValue(content, TodoItem.class);
-        assert data != null;
+        assertNotNull(data);
         itemId = data.getItemId();
         assertEquals(listId, data.getListId());
         assertEquals("Test Task", data.getTaskName());
@@ -70,18 +81,16 @@ class TodoItemControllerIT {
     @Test
     @Order(2)
     void testGetItemsOfOneList() throws Exception {
-
-
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get(baseUrl + "/list/" + listId))
                 .andExpect(status().isOk()).andReturn();
-                // .andExpect(jsonPath("$.taskName").value("Test Task"));;
+
         String content = result.getResponse().getContentAsString();
-        List<TodoItem> data = objectMapper.readValue(content, new TypeReference<List<TodoItem>>(){});
-        assert data != null;
-        assertEquals(1, data.size());
-        assertEquals(listId, data.getFirst().getListId());
-        assertEquals(itemId, data.getFirst().getItemId());
-        assertEquals("Test Task", data.getFirst().getTaskName());
+        TodoItem[] data = objectMapper.readValue(content, TodoItem[].class);
+        assertNotNull(data);
+        assertEquals(1, data.length);
+        assertEquals(listId, data[0].getListId());
+        assertEquals(itemId, data[0].getItemId());
+        assertEquals("Test Task", data[0].getTaskName());
     }
 
     @Test
@@ -103,8 +112,7 @@ class TodoItemControllerIT {
     @Test
     @Order(4)
     void testDeleteTodoItem() throws Exception {
-        long id = itemId;
-        mockMvc.perform(MockMvcRequestBuilders.delete(baseUrl + "/delete/" + id))
+        mockMvc.perform(MockMvcRequestBuilders.delete(baseUrl + "/delete/" + itemId))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"));
     }

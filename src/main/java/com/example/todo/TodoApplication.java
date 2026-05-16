@@ -10,7 +10,6 @@ import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.micrometer.metrics.autoconfigure.MeterRegistryCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -70,10 +69,5 @@ public class TodoApplication {
         return registry -> registry.config().commonTags("application", applicationName);
     }
 
-    @Bean
-    MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
-        String applicationName = env.getProperty("spring.application.name");
-        return registry -> registry.config().commonTags("application", applicationName);
-    }
 
 }
