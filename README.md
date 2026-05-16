@@ -1,4 +1,4 @@
-# Spring Boot (v 3.4.2) To-Do List Application
+# Spring Boot (v 4.0.6) To-Do List Application
 
 ## Content
 
@@ -41,7 +41,7 @@ This is a Spring Boot MVC application for managing To-Do lists and their items. 
 
 ### Prerequisites
 
-- Java 17+
+- Java 25+
 - Maven 3.8+
 - Docker (for containerized deployment)
 
@@ -161,7 +161,7 @@ The difference to the original is a changed technology stack.
 the project has been created by using IntelliJ Ultimate edition.
 The technology stack consists of the following components:
 
-- Spring Boot (Version 3.4.2)
+- Spring Boot (Version 4.0.6)
 - Java Persistence API
 - Rest Controller
 - Thymeleaf Template Engine
@@ -211,11 +211,15 @@ Add the following libraries to the _pom.xml_ file:
      <groupId>org.springframework.boot</groupId>
      <artifactId>spring-boot-starter-validation</artifactId>
   </dependency>
+  <dependency>
+     <groupId>org.springframework.boot</groupId>
+     <artifactId>spring-boot-h2console</artifactId>
+  </dependency>
      <!-- Open API  -->
   <dependency>
     <groupId>org.springdoc</groupId>
     <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-    <version>2.8.5</version>
+    <version>3.0.1</version>
   </dependency>
 
 ```
@@ -272,7 +276,7 @@ We can add information about our source code repository and maven build stamp to
    </scm>
    <description>Demo project for Spring Boot</description>
    <properties>
-      <java.version>21</java.version>
+      <java.version>25</java.version>
       <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
    </properties>
 ```
@@ -1688,9 +1692,7 @@ The _application-h2.properties_ are configuring the H2 database including the _h
 ```properties
 
 spring.jpa.hibernate.ddl-auto=create-drop
-spring.jpa.database-platform=org.hibernate.dialect.H2Dialect
 spring.jpa.open-in-view=false
-spring.jpa.properties.hibernate.id.new_generator_mappings=false
 
 spring.datasource.driverClassName=org.h2.Driver
 # spring.datasource.url=jdbc:h2:file:./data/testdb
@@ -1718,8 +1720,6 @@ contains options to:
 ```properties
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.open-in-view=false
-spring.jpa.properties.hibernate.id.new_generator_mappings=false
-spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
 
 spring.datasource.driverClassName=com.mysql.cj.jdbc.Driver
 spring.datasource.url=jdbc:mysql://${APP_DB_HOST:localhost}:${APP_DB_PORT:3306}/${APP_DB_NAME:todoapp}?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&useLegacyDatetimeCode=false&createDatabaseIfNotExist=true
@@ -2841,7 +2841,7 @@ $  docker-compose -f docker-compose-h2.yml rm
 
 ### Create a Dockerfile
 
-The Dockerfile takes a slim _JDK11 image_, adds the _todo-*.jar_ file from the _target_ folder with the name _app.jar_. This jar file is started by _java -jar_ command.
+The Dockerfile takes a slim _JDK image_, adds the _todo-*.jar_ file from the _target_ folder with the name _app.jar_. This jar file is started by _java -jar_ command.
 
 <br/>
 
@@ -2849,7 +2849,7 @@ The Dockerfile takes a slim _JDK11 image_, adds the _todo-*.jar_ file from the _
 #
 # Build stage
 #
-FROM maven:3.9.5-eclipse-temurin-21-alpine AS build
+FROM maven:3.9.9-eclipse-temurin-25-alpine AS build
 COPY src /home/app/src
 COPY pom.xml /home/app
 RUN mvn -DskipTests -f /home/app/pom.xml clean package
@@ -2857,7 +2857,7 @@ RUN mvn -DskipTests -f /home/app/pom.xml clean package
 #
 # Package stage
 #
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:25-jdk-jammy
 COPY --from=build /home/app/target/todo-*.jar /usr/local/lib/app.jar
 ARG JVM_OPTS
 ENV JVM_OPTS=${JVM_OPTS}

@@ -69,7 +69,7 @@ class TodoListNameControllerTest {
 
         ResponseEntity<TodoListNameDTO> response = todoListNameController.getTodoListNameById(listId);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertNotNull(response.getBody());
         assertEquals("Sample List", response.getBody().getListName());
     }
@@ -80,7 +80,7 @@ class TodoListNameControllerTest {
 
         ResponseEntity<TodoListNameDTO> response = todoListNameController.getTodoListNameById(listId);
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
     }
 
     @Test
@@ -103,7 +103,7 @@ class TodoListNameControllerTest {
 
         ResponseEntity<TodoListName> response = todoListNameController.updateTodoListName(listId, updatedDetails);
 
-        assertEquals(200, response.getStatusCodeValue());
+        assertEquals(200, response.getStatusCode().value());
         assertEquals("Updated List", response.getBody().getName());
     }
 
@@ -113,7 +113,7 @@ class TodoListNameControllerTest {
 
         ResponseEntity<TodoListName> response = todoListNameController.updateTodoListName(listId, new TodoListName());
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
     }
 
     @Test
@@ -124,7 +124,7 @@ class TodoListNameControllerTest {
 
         ResponseEntity<Void> response = todoListNameController.deleteTodoListName(listId);
 
-        assertEquals(204, response.getStatusCodeValue());
+        assertEquals(204, response.getStatusCode().value());
     }
 
     @Test
@@ -133,6 +133,6 @@ class TodoListNameControllerTest {
 
         ResponseEntity<Void> response = todoListNameController.deleteTodoListName(listId);
 
-        assertEquals(404, response.getStatusCodeValue());
+        assertEquals(404, response.getStatusCode().value());
     }
 }
