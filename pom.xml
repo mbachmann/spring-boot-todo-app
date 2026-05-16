@@ -28,7 +28,7 @@
    <properties>
       <java.version>25</java.version>
        <timestamp>${maven.build.timestamp}</timestamp>
-      <maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+      <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
    </properties>
    <dependencies>
       <dependency>
@@ -89,6 +89,11 @@
       </dependency>
       <dependency>
          <groupId>org.springframework.boot</groupId>
+         <artifactId>spring-boot-starter-data-jpa-test</artifactId>
+         <scope>test</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework.boot</groupId>
          <artifactId>spring-boot-starter-webmvc-test</artifactId>
          <scope>test</scope>
       </dependency>
@@ -100,12 +105,17 @@
       <dependency>
          <groupId>org.springdoc</groupId>
          <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-         <version>3.0.1</version>
+         <version>3.0.3</version>
       </dependency>
       <dependency>
-         <groupId>org.apache.maven</groupId>
-         <artifactId>maven-model</artifactId>
-         <version>3.9.6</version>
+         <groupId>org.apache.commons</groupId>
+         <artifactId>commons-compress</artifactId>
+         <version>1.26.0</version>
+      </dependency>
+      <dependency>
+         <groupId>commons-codec</groupId>
+         <artifactId>commons-codec</artifactId>
+         <version>1.17.0</version>
       </dependency>
    </dependencies>
 
@@ -114,6 +124,13 @@
          <plugin>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>
+            <executions>
+               <execution>
+                  <goals>
+                     <goal>build-info</goal>
+                  </goals>
+               </execution>
+            </executions>
          </plugin>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>

@@ -8,6 +8,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -24,9 +25,10 @@ class VersionControllerTest {
         mockMvc.perform(get("/version"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("version-template"))
-                .andExpect(model().attributeExists("projectVersion"))
-                .andExpect(model().attributeExists("springBootVersion"))
-                .andExpect(model().attributeExists("springDocVersion"))
-                .andExpect(model().attributeExists("javaVersion"));
+                .andExpect(model().attribute("projectVersion", "0.0.1-SNAPSHOT"))
+                .andExpect(model().attribute("springBootVersion", "4.0.6"))
+                .andExpect(model().attribute("springDocVersion", "3.0.3"))
+                .andExpect(model().attribute("javaVersion", "25"))
+                .andExpect(model().attribute("buildTime", matchesPattern("\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}")));
     }
 }
